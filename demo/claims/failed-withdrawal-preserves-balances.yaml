@@ -17,6 +17,7 @@ dependencies:
   - crates/vault-program/Cargo.toml
   - crates/vault-program/src/lib.rs
   - scripts/mollusk-trial.sh
+  - scripts/replay.sh
   - demo/specs/withdrawal.md
   - demo/fixtures/unauthorized-withdrawal.txt
   - rust-toolchain.toml

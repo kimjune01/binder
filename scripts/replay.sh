@@ -25,6 +25,8 @@ if ! command -v cargo-build-sbf >/dev/null 2>&1 || \
   cargo install cargo-build-sbf --version "$expected_sbf_builder" --locked
 fi
 
+bash scripts/mollusk-trial.sh vulnerable
+bash scripts/mollusk-trial.sh fixed
 cargo test --workspace --locked
 cargo run --quiet --locked -p binder-cli -- verify "$claim"
 first_receipt="$(sha256_file .binder/claims/failed-withdrawal-preserves-balances.yaml)"
