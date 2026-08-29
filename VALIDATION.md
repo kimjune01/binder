@@ -4,6 +4,8 @@
 
 Do not build `binder init`, release packaging, a registry, or deployment integrations until this study shows that Binder improves a real review decision.
 
+The [online evidence scan](ONLINE_RESEARCH.md) supports prioritizing agent fixes with non-discriminating checks and post-audit refactors. It does not yet establish demand for manifests, replay bundles, or a hosted registry.
+
 The hypothesis is:
 
 > For consequential agent-produced changes, a named claim with differential, fresh, replayable evidence helps reviewers reach a correct decision faster than ordinary PR context and CI output.
@@ -145,4 +147,3 @@ After five cases, group observations by job rather than requested feature:
 - maintain the claim across changes.
 
 Rank product changes by observed decision impact and frequency. A feature request without an observed review failure stays out of the build plan.
-

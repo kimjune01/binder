@@ -31,3 +31,4 @@ Each verification writes a content-addressed directory under `.binder/receipts/`
 See [DEMO.md](DEMO.md) for the goal and [AUDIT.md](AUDIT.md) for the acceptance-criteria audit.
 See [PRODUCTION.md](PRODUCTION.md) for the staged plan from local demo to a GitHub workflow and public program-status API.
 The [validation study](VALIDATION.md) is the gate for any further product build.
+See [ONLINE_RESEARCH.md](ONLINE_RESEARCH.md) for the firsthand complaints and incidents motivating that study.
