@@ -18,12 +18,14 @@ esac
 export PATH="$HOME/.cargo/bin:$PATH"
 if [[ -n "$feature" ]]; then
   cargo-build-sbf \
+    --quiet \
     --manifest-path crates/vault-program/Cargo.toml \
     --sbf-out-dir "target/deploy/$revision" \
     --features "$feature"
 else
   cargo-build-sbf \
+    --quiet \
     --manifest-path crates/vault-program/Cargo.toml \
     --sbf-out-dir "target/deploy/$revision"
 fi
-cargo run --quiet -p vault-mollusk --bin mollusk-trial -- "$revision"
+RUST_LOG=off cargo run --quiet -p vault-mollusk --bin mollusk-trial -- "$revision"
