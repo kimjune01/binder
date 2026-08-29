@@ -121,6 +121,56 @@ claim. A human-authored entitlement edge must state why the component claims
 jointly warrant the agreement-level claim. Agents may then resolve identities,
 reuse current receipts, execute missing checks, and surface unsupported edges.
 
+## Portability
+
+A useful contract package should not be trapped in one deployment, chain, or
+implementation language. Like a model package that can target different
+inference backends, an agreement should carry its semantics and evaluation
+requirements into another compatible environment.
+
+The layers have different portability:
+
+```text
+most portable
+  intent and behavioral claims
+  entitlement rules and failure paths
+  interface and parameter schema
+  fixtures, test vectors, and expected observations
+  source implementation
+  compiled artifact
+  deployment address and live state
+least portable
+```
+
+Porting among compatible runtimes may reuse source while changing chain ID,
+dependency addresses, tokens, timing assumptions, and deployment identity.
+Porting across runtimes may require a new implementation: an EVM escrow and a
+Solana escrow can expose the same agreement while using different execution,
+storage, and authorization models.
+
+The agreement and its questions travel; unsupported answers do not. A port may
+reuse claims, specifications, entitlement rules, and evaluation vectors. It
+must regenerate build identity, dependency evidence, runtime observations,
+deployment identity, and receipts for the target environment.
+
+```text
+portable semantic package
+        ↓
+target-specific implementation and dependencies
+        ↓
+target-specific evidence graph
+        ↓
+new rooted package for both parties to sign
+```
+
+Binder should make selective re-verification possible by distinguishing shared
+semantic nodes from runtime-specific evidence. Popularity or assurance earned
+by one deployment may help a user choose the package, but it must not silently
+warrant a different port.
+
+> Port the agreement and its questions; regenerate the evidence wherever it
+> lands.
+
 ## The shopping experience
 
 A credible contract marketplace should let an agent answer:
@@ -132,6 +182,8 @@ A credible contract marketplace should let an agent answer:
 - Which external observations can affect settlement?
 - What happens on silence, disagreement, missing data, or timeout?
 - Does the deployed artifact match the package we evaluated?
+- Which parts of this package are portable to our target runtime, and which
+  evidence must be regenerated?
 - What would invalidate the current evidence?
 
 Each party may use different agents, evidence policies, and private context.
