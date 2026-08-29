@@ -21,26 +21,42 @@ fn main() {
 
 fn run() -> Result<(), String> {
     let args = env::args().skip(1).collect::<Vec<_>>();
-    let [command, claim_path] = args.as_slice() else {
-        return Err("usage: binder-cli <verify|status> <claim.yaml>".into());
+    let (command, claim_path, format) = match args.as_slice() {
+        [command, claim_path] => (command, claim_path, OutputFormat::Text),
+        [command, claim_path, flag, value] if flag == "--format" && value == "json" => {
+            (command, claim_path, OutputFormat::Json)
+        }
+        _ => {
+            return Err("usage: binder-cli <verify|status> <claim.yaml> [--format json]".into());
+        }
     };
 
     let root = env::current_dir().map_err(|error| format!("find workspace root: {error}"))?;
     let loaded = load_claim(&root, Path::new(claim_path))?;
     match command.as_str() {
-        "verify" => verify(&root, loaded),
-        "status" => status(&root, loaded),
+        "verify" => verify(&root, loaded, format),
+        "status" => status(&root, loaded, format),
         _ => Err(format!("unknown command: {command}")),
     }
 }
 
-fn verify(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
+#[derive(Clone, Copy, Eq, PartialEq)]
+enum OutputFormat {
+    Text,
+    Json,
+}
+
+fn verify(
+    root: &Path,
+    loaded: binder_core::LoadedClaim,
+    format: OutputFormat,
+) -> Result<(), String> {
     let mut base = Vec::new();
     let mut head = Vec::new();
     let mut raw_outputs = Vec::new();
 
     for trial in &loaded.trials {
-        let base_result = execute(root, trial, "vulnerable")?;
+        let base_result = execute(root, trial, "vulnerable", format)?;
         raw_outputs.push((base_result.stdout.clone(), base_result.stderr.clone()));
         base.push(
             Evidence::new(
@@ -60,7 +76,7 @@ fn verify(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
             ),
         );
 
-        let head_result = execute(root, trial, "fixed")?;
+        let head_result = execute(root, trial, "fixed", format)?;
         raw_outputs.push((head_result.stdout.clone(), head_result.stderr.clone()));
         head.push(
             Evidence::new(
@@ -126,7 +142,14 @@ fn verify(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
             .display()
     ));
     write_github_summary(warrant.status, &report)?;
-    print!("{report}");
+    emit_output(
+        format,
+        "verify",
+        &loaded.claim,
+        warrant.status,
+        Some(&receipt_digest),
+        &report,
+    )?;
 
     if !matches!(warrant.status, binder_core::WarrantStatus::Warranted) {
         std::process::exit(1);
@@ -175,7 +198,11 @@ fn package_replay_bundle(
     Ok(())
 }
 
-fn status(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
+fn status(
+    root: &Path,
+    loaded: binder_core::LoadedClaim,
+    format: OutputFormat,
+) -> Result<(), String> {
     let receipt_path = root.join(".binder/claims").join(&loaded.claim.id);
     let pointer = fs::read_to_string(&receipt_path).map_err(|error| {
         format!(
@@ -221,9 +248,46 @@ fn status(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
     }
     let report = render_report(&loaded.claim, &warrant, &bundle.head);
     write_github_summary(warrant.status, &report)?;
-    print!("{report}");
+    emit_output(
+        format,
+        "status",
+        &loaded.claim,
+        warrant.status,
+        Some(receipt_digest),
+        &report,
+    )?;
     if !matches!(warrant.status, binder_core::WarrantStatus::Warranted) {
         std::process::exit(1);
+    }
+    Ok(())
+}
+
+fn emit_output(
+    format: OutputFormat,
+    command: &str,
+    claim: &binder_core::Claim,
+    status: WarrantStatus,
+    receipt_digest: Option<&str>,
+    report: &str,
+) -> Result<(), String> {
+    match format {
+        OutputFormat::Text => print!("{report}"),
+        OutputFormat::Json => {
+            let document = serde_json::json!({
+                "schema_version": 1,
+                "binder_version": BINDER_VERSION,
+                "command": command,
+                "claim_id": claim.id,
+                "statement": claim.statement,
+                "status": format!("{status:?}").to_ascii_uppercase(),
+                "receipt_digest": receipt_digest,
+            });
+            println!(
+                "{}",
+                serde_json::to_string(&document)
+                    .map_err(|error| format!("serialize JSON output: {error}"))?
+            );
+        }
     }
     Ok(())
 }
@@ -255,7 +319,12 @@ struct Execution {
     artifacts: BTreeMap<String, String>,
 }
 
-fn execute(root: &Path, trial: &binder_core::Trial, revision: &str) -> Result<Execution, String> {
+fn execute(
+    root: &Path,
+    trial: &binder_core::Trial,
+    revision: &str,
+    format: OutputFormat,
+) -> Result<Execution, String> {
     let args = trial
         .command
         .iter()
@@ -269,9 +338,15 @@ fn execute(root: &Path, trial: &binder_core::Trial, revision: &str) -> Result<Ex
         .current_dir(root)
         .output()
         .map_err(|error| format!("execute {program}: {error}"))?;
-    io::stdout()
-        .write_all(&output.stdout)
-        .map_err(|error| format!("write trial stdout: {error}"))?;
+    if format == OutputFormat::Text {
+        io::stdout()
+            .write_all(&output.stdout)
+            .map_err(|error| format!("write trial stdout: {error}"))?;
+    } else {
+        io::stderr()
+            .write_all(&output.stdout)
+            .map_err(|error| format!("write trial stdout diagnostics: {error}"))?;
+    }
     io::stderr()
         .write_all(&output.stderr)
         .map_err(|error| format!("write trial stderr: {error}"))?;

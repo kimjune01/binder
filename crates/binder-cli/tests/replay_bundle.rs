@@ -13,7 +13,11 @@ fn verify_packages_inputs_and_raw_trial_outputs() {
         "version: 1\nid: portable-demo\nclaim: fixed passes\ndependencies: [claim.yaml, input.txt]\nrequired_trials: [trial]\ntrials:\n  - id: trial\n    command: [sh, trial.sh, \"{revision}\"]\n",
     )
     .unwrap();
-    fs::write(dir.path().join("trial.sh"), "test \"$1\" = fixed\n").unwrap();
+    fs::write(
+        dir.path().join("trial.sh"),
+        "echo trial-$1\ntest \"$1\" = fixed\n",
+    )
+    .unwrap();
 
     let output = Command::new(env!("CARGO_BIN_EXE_binder-cli"))
         .args(["verify", "claim.yaml"])
@@ -59,4 +63,18 @@ fn verify_packages_inputs_and_raw_trial_outputs() {
     assert!(summary.contains("fixed passes"));
     assert!(summary.contains("Base  FAIL (expected; bug reproduced)"));
     assert!(summary.contains("Head  PASS"));
+
+    let json_output = Command::new(env!("CARGO_BIN_EXE_binder-cli"))
+        .args(["verify", "claim.yaml", "--format", "json"])
+        .current_dir(dir.path())
+        .output()
+        .unwrap();
+    assert!(json_output.status.success());
+    let document: serde_json::Value = serde_json::from_slice(&json_output.stdout).unwrap();
+    assert_eq!(document["schema_version"], 1);
+    assert_eq!(document["command"], "verify");
+    assert_eq!(document["claim_id"], "portable-demo");
+    assert_eq!(document["statement"], "fixed passes");
+    assert_eq!(document["status"], "WARRANTED");
+    assert!(document["receipt_digest"].as_str().unwrap().len() == 64);
 }

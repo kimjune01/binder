@@ -377,6 +377,7 @@ version = "0.1.0"
 dependencies = [
  "binder-core",
  "serde",
+ "serde_json",
  "serde_yaml",
  "tempfile",
 ]
