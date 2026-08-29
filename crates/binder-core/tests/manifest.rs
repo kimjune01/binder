@@ -78,7 +78,7 @@ fn rejects_v2_trials_without_an_evidence_kind() {
     let path = dir.path().join("claim.yaml");
     fs::write(
         &path,
-        "version: 2\nid: x\nclaim: x\ndependencies: [claim.yaml]\nrequired_trials: [x]\ntrials:\n  - id: x\n    command: [true]\n",
+        "version: 2\nid: x\nclaim: x\nentitlement: {authored_by: maintainer, base: refuted, head: stood}\ndependencies: [claim.yaml]\nrequired_trials: [x]\ntrials:\n  - id: x\n    command: [true]\n",
     )
     .unwrap();
 
@@ -91,7 +91,20 @@ fn rejects_overlay_paths_that_escape_the_worktree() {
     let path = dir.path().join("claim.yaml");
     fs::write(
         &path,
-        "version: 2\nid: x\nclaim: x\ndependencies: [claim.yaml]\nrequired_trials: [x]\ntrials:\n  - id: x\n    evidence_kind: empirical\n    command: [true]\n    overlay_from_head: [../outside]\n",
+        "version: 2\nid: x\nclaim: x\nentitlement: {authored_by: maintainer, base: refuted, head: stood}\ndependencies: [claim.yaml]\nrequired_trials: [x]\ntrials:\n  - id: x\n    evidence_kind: empirical\n    command: [true]\n    overlay_from_head: [../outside]\n",
+    )
+    .unwrap();
+
+    assert!(load_claim(dir.path(), &path).is_err());
+}
+
+#[test]
+fn rejects_v2_claims_without_an_authored_entitlement_rule() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("claim.yaml");
+    fs::write(
+        &path,
+        "version: 2\nid: x\nclaim: x\ndependencies: [claim.yaml]\nrequired_trials: [x]\ntrials:\n  - id: x\n    evidence_kind: empirical\n    command: [true]\n",
     )
     .unwrap();
 

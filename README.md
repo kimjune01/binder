@@ -1,6 +1,14 @@
 # Binder demo
 
-Binder turns a small, named claim into locally replayable evidence. This demonstrator compares a deliberately broken vault revision with its fixed revision across a pure Rust transition check and a Mollusk runtime replay.
+Binder lets humans state what observations would warrant a software claim, then materializes the evidence graph for an exact change. The smallest walkthrough is the [escrow contract example](demo/contract/README.md):
+
+```sh
+bash demo/contract/run.sh
+```
+
+It preserves an attributed base/refutation → candidate/standing rule, runs the same empirical check against both Git revisions, captures concrete balance witnesses, and emits an agent-readable receipt.
+
+The original, deeper demonstrator compares a deliberately broken Solana vault revision with its fixed revision across a pure Rust transition check and a Mollusk runtime replay.
 
 See [PRODUCT.md](PRODUCT.md) for the canonical product framing and scope.
 

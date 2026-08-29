@@ -95,6 +95,10 @@ fn verify_typed(
     }
 
     let result: Result<bool, String> = (|| {
+        let entitlement = loaded
+            .entitlement
+            .clone()
+            .ok_or("v2 claim requires an authored entitlement rule")?;
         let mut trials = Vec::new();
         for trial in &loaded.trials {
             let evidence_kind = trial
@@ -118,15 +122,16 @@ fn verify_typed(
             .filter(|trial| required.contains(&trial.id))
             .all(|trial| {
                 trial.base.execution == ExecutionOutcome::Completed
-                    && trial.base.observation == Observation::Refuted
+                    && trial.base.observation == entitlement.base
                     && trial.head.execution == ExecutionOutcome::Completed
-                    && trial.head.observation == Observation::Stood
+                    && trial.head.observation == entitlement.head
             });
         let receipt = TypedReceipt {
             schema_version: TYPED_RECEIPT_SCHEMA_VERSION,
             binder_version: BINDER_VERSION.into(),
             claim_id: loaded.claim.id.clone(),
             statement: loaded.claim.statement.clone(),
+            entitlement: entitlement.clone(),
             subject: Subject {
                 base: base.clone(),
                 head: head.clone(),
@@ -156,13 +161,16 @@ fn verify_typed(
                 println!("{}", serde_json::to_string(&value).unwrap());
             }
             OutputFormat::Text => println!(
-                "{}\nClaim  {}\nBase   {}\nHead   {}\nReceipt {}",
+                "{}\nClaim  {}\nRule   {}: base {} → head {}\nBase   {}\nHead   {}\nReceipt {}",
                 if warranted {
                     "WARRANTED"
                 } else {
                     "NOT WARRANTED"
                 },
                 loaded.claim.statement,
+                entitlement.authored_by,
+                format!("{:?}", entitlement.base).to_ascii_lowercase(),
+                format!("{:?}", entitlement.head).to_ascii_lowercase(),
                 base,
                 head,
                 digest

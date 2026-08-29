@@ -34,7 +34,7 @@ fn fixture(check: &str) -> (TempDir, String, String) {
     fs::write(dir.path().join("check.sh"), check).unwrap();
     fs::write(
         dir.path().join("claim.yaml"),
-        "version: 2\nid: behavior-is-fixed\nclaim: Behavior is fixed.\ndependencies: [behavior.txt, check.sh, claim.yaml]\nrequired_trials: [behavior]\ntrials:\n  - id: behavior\n    evidence_kind: empirical\n    command: [bash, check.sh]\n    overlay_from_head: [check.sh]\n",
+        "version: 2\nid: behavior-is-fixed\nclaim: Behavior is fixed.\nentitlement:\n  authored_by: fixture-maintainer\n  base: refuted\n  head: stood\ndependencies: [behavior.txt, check.sh, claim.yaml]\nrequired_trials: [behavior]\ntrials:\n  - id: behavior\n    evidence_kind: empirical\n    command: [bash, check.sh]\n    overlay_from_head: [check.sh]\n",
     )
     .unwrap();
     git(dir.path(), &["add", "."]);
@@ -92,6 +92,9 @@ fi
     assert_eq!(json["subject"]["base"], base);
     assert_eq!(json["subject"]["head"], head);
     assert_eq!(json["schema_version"], 2);
+    assert_eq!(json["entitlement"]["authored_by"], "fixture-maintainer");
+    assert_eq!(json["entitlement"]["base"], "refuted");
+    assert_eq!(json["entitlement"]["head"], "stood");
     assert_eq!(json["trials"][0]["evidence_kind"], "empirical");
     assert_eq!(json["trials"][0]["base"]["execution"], "completed");
     assert_eq!(json["trials"][0]["base"]["observation"], "refuted");

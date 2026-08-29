@@ -27,6 +27,7 @@ pub struct LoadedClaim {
     pub dependency_paths: Vec<String>,
     pub snapshot: DependencySnapshot,
     pub trials: Vec<Trial>,
+    pub entitlement: Option<EntitlementRule>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Deserialize)]
@@ -64,6 +65,14 @@ pub enum Observation {
     Stood,
     Refuted,
     NoVerdict,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct EntitlementRule {
+    pub authored_by: String,
+    pub base: Observation,
+    pub head: Observation,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
@@ -109,6 +118,7 @@ pub struct TypedReceipt {
     pub binder_version: String,
     pub claim_id: String,
     pub statement: String,
+    pub entitlement: EntitlementRule,
     pub subject: Subject,
     pub trials: Vec<TypedTrialReceipt>,
     pub freshness: Freshness,
@@ -131,6 +141,8 @@ struct ClaimFile {
     version: u32,
     id: String,
     claim: String,
+    #[serde(default)]
+    entitlement: Option<EntitlementRule>,
     dependencies: Vec<String>,
     required_trials: Vec<String>,
     trials: Vec<Trial>,
@@ -358,6 +370,18 @@ pub fn load_claim(root: &Path, path: &Path) -> Result<LoadedClaim, String> {
         return Err("trial commands must contain non-empty arguments".into());
     }
     if parsed.version == 2 {
+        let entitlement = parsed
+            .entitlement
+            .as_ref()
+            .ok_or("v2 claim requires an authored entitlement rule")?;
+        if entitlement.authored_by.trim().is_empty() {
+            return Err("entitlement authored_by must not be empty".into());
+        }
+        if matches!(entitlement.base, Observation::NoVerdict)
+            || matches!(entitlement.head, Observation::NoVerdict)
+        {
+            return Err("entitlement outcomes must be stood or refuted".into());
+        }
         for trial in &parsed.trials {
             if trial.evidence_kind.is_none() {
                 return Err(format!("v2 trial {} requires evidence_kind", trial.id));
@@ -392,6 +416,7 @@ pub fn load_claim(root: &Path, path: &Path) -> Result<LoadedClaim, String> {
         dependency_paths: parsed.dependencies,
         snapshot,
         trials: parsed.trials,
+        entitlement: parsed.entitlement,
     })
 }
 

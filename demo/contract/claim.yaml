@@ -1,6 +1,10 @@
 version: 2
 id: escrow-requires-both-approvals
 claim: Escrow funds move only when both parties approve the release.
+entitlement:
+  authored_by: escrow-maintainers
+  base: refuted
+  head: stood
 dependencies:
   - demo/contract/escrow.rs
   - demo/contract/check.rs
