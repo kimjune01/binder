@@ -378,6 +378,7 @@ dependencies = [
  "binder-core",
  "serde",
  "serde_yaml",
+ "tempfile",
 ]
 
 [[package]]

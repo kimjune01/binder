@@ -70,6 +70,8 @@ pub struct Evidence {
     pub stderr_sha256: String,
     #[serde(default)]
     pub artifacts: BTreeMap<String, String>,
+    #[serde(default)]
+    pub observation: String,
 }
 
 impl Evidence {
@@ -86,6 +88,7 @@ impl Evidence {
             stdout_sha256: String::new(),
             stderr_sha256: String::new(),
             artifacts: BTreeMap::new(),
+            observation: String::new(),
         }
     }
 
@@ -100,6 +103,9 @@ impl Evidence {
         self.stdout_sha256 = hex_digest(stdout);
         self.stderr_sha256 = hex_digest(stderr);
         self.artifacts = artifacts;
+        self.observation = first_observation(stderr)
+            .or_else(|| first_observation(stdout))
+            .unwrap_or_default();
         self
     }
 }
@@ -161,7 +167,10 @@ fn validate_evidence_set(
             ));
         }
         if item.command.is_empty() || item.command.iter().any(String::is_empty) {
-            return Err(format!("{} {revision} evidence has no command", item.trial_id));
+            return Err(format!(
+                "{} {revision} evidence has no command",
+                item.trial_id
+            ));
         }
         if !is_sha256(&item.stdout_sha256) || !is_sha256(&item.stderr_sha256) {
             return Err(format!(
@@ -387,9 +396,21 @@ pub fn render_report(claim: &Claim, warrant: &Warrant, evidence: &[Evidence]) ->
                 &item.dependencies.identity[..12]
             )
             .expect("writing to a string cannot fail");
+            if item.verdict == EvidenceVerdict::Fail && !item.observation.is_empty() {
+                writeln!(&mut report, "        {}", item.observation)
+                    .expect("writing to a string cannot fail");
+            }
         }
     }
     report
+}
+
+fn first_observation(bytes: &[u8]) -> Option<String> {
+    String::from_utf8_lossy(bytes)
+        .lines()
+        .map(str::trim)
+        .find(|line| !line.is_empty())
+        .map(|line| line.strip_prefix("FAIL: ").unwrap_or(line).to_owned())
 }
 
 fn status_label(status: WarrantStatus) -> &'static str {

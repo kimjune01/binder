@@ -35,9 +35,11 @@ fn run() -> Result<(), String> {
 fn verify(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
     let mut base = Vec::new();
     let mut head = Vec::new();
+    let mut raw_outputs = Vec::new();
 
     for trial in &loaded.trials {
         let base_result = execute(root, trial, "vulnerable")?;
+        raw_outputs.push((base_result.stdout.clone(), base_result.stderr.clone()));
         base.push(
             Evidence::new(
                 &trial.id,
@@ -57,6 +59,7 @@ fn verify(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
         );
 
         let head_result = execute(root, trial, "fixed")?;
+        raw_outputs.push((head_result.stdout.clone(), head_result.stderr.clone()));
         head.push(
             Evidence::new(
                 &trial.id,
@@ -93,6 +96,7 @@ fn verify(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
         .map_err(|error| format!("serialize receipt bundle: {error}"))?;
     fs::write(receipt_dir.join("receipt.yaml"), receipt)
         .map_err(|error| format!("write receipt bundle: {error}"))?;
+    package_replay_bundle(root, &receipt_dir, &loaded.dependency_paths, &raw_outputs)?;
     let claim_dir = root.join(".binder/claims");
     fs::create_dir_all(&claim_dir)
         .map_err(|error| format!("create {}: {error}", claim_dir.display()))?;
@@ -122,6 +126,47 @@ fn verify(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
     if !matches!(warrant.status, binder_core::WarrantStatus::Warranted) {
         std::process::exit(1);
     }
+    Ok(())
+}
+
+fn package_replay_bundle(
+    root: &Path,
+    receipt_dir: &Path,
+    dependency_paths: &[String],
+    raw_outputs: &[(Vec<u8>, Vec<u8>)],
+) -> Result<(), String> {
+    for relative in dependency_paths {
+        let destination = receipt_dir.join("inputs").join(relative);
+        if let Some(parent) = destination.parent() {
+            fs::create_dir_all(parent)
+                .map_err(|error| format!("create {}: {error}", parent.display()))?;
+        }
+        fs::copy(root.join(relative), &destination)
+            .map_err(|error| format!("package {relative}: {error}"))?;
+    }
+
+    let outputs = receipt_dir.join("outputs");
+    fs::create_dir_all(&outputs)
+        .map_err(|error| format!("create {}: {error}", outputs.display()))?;
+    for (pair_index, pair) in raw_outputs.chunks_exact(2).enumerate() {
+        for (revision, trial) in [("base", &pair[0]), ("head", &pair[1])] {
+            fs::write(
+                outputs.join(format!("{revision}-{pair_index}.stdout")),
+                &trial.0,
+            )
+            .map_err(|error| format!("write replay stdout: {error}"))?;
+            fs::write(
+                outputs.join(format!("{revision}-{pair_index}.stderr")),
+                &trial.1,
+            )
+            .map_err(|error| format!("write replay stderr: {error}"))?;
+        }
+    }
+    fs::write(
+        receipt_dir.join("REPLAY.md"),
+        "# Binder replay bundle\n\nThe `inputs/` tree contains every declared input. Raw captured trial streams are in `outputs/`; their SHA-256 digests are recorded in `receipt.yaml`. External crates are pinned by `inputs/Cargo.lock` when present. From the original checkout, run `bash scripts/replay.sh`.\n",
+    )
+    .map_err(|error| format!("write replay instructions: {error}"))?;
     Ok(())
 }
 

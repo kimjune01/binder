@@ -2,7 +2,7 @@ use std::fs;
 
 use binder_core::{
     Claim, DependencySnapshot, Evidence, EvidenceVerdict, ReceiptBundle, WarrantStatus,
-    changed_artifacts, evaluate, snapshot_dependencies, validate_receipt,
+    changed_artifacts, evaluate, render_report, snapshot_dependencies, validate_receipt,
 };
 use tempfile::tempdir;
 
@@ -186,4 +186,23 @@ fn rejects_receipts_whose_recorded_status_does_not_match_the_evidence() {
     receipt.head[0].verdict = EvidenceVerdict::Fail;
 
     assert!(validate_receipt(&claim(), &receipt).is_err());
+}
+
+#[test]
+fn failed_evidence_reports_its_observed_predicate() {
+    let snapshot = DependencySnapshot {
+        identity: "0123456789abcdef".into(),
+        files: Default::default(),
+    };
+    let evidence = Evidence::new("runtime-replay", EvidenceVerdict::Fail, snapshot.clone())
+        .with_observation(
+            vec!["trial".into()],
+            b"",
+            b"FAIL: recipient balance changed after rejection\nmore detail\n",
+            Default::default(),
+        );
+    let warrant = evaluate(&claim(), &snapshot, &[], &[evidence.clone()]);
+
+    let report = render_report(&claim(), &warrant, &[evidence]);
+    assert!(report.contains("recipient balance changed after rejection"));
 }
