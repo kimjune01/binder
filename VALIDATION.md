@@ -3,6 +3,12 @@
 [OUTREACH.md](OUTREACH.md) contains the conversational invitations and moderated
 demo script used to recruit and run these sessions.
 
+Complete [SECONDARY_RESEARCH.md](SECONDARY_RESEARCH.md) before recruiting and
+keep searching while a question remains publicly answerable. The public corpus
+supplies workflow discovery; live sessions are reserved for facts that are
+private or tacit, and for observing whether the Binder artifact changes a real
+decision. Never ask participants to restate documented problems.
+
 ## Decision
 
 Do not build `binder init`, release packaging, a registry, or deployment integrations until this study shows that Binder improves a real review decision.

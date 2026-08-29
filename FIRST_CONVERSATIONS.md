@@ -1,6 +1,8 @@
 # Binder first-conversation kit
 
-This is the operating sheet for the first six conversations. The goal is not
+This is a dormant operating sheet for targeted conversations. Do not use it
+until the [secondary-research corpus](SECONDARY_RESEARCH.md) reaches saturation
+and a question ledger shows why conversation is necessary. The goal is not
 to pitch Binder. It is to learn whether preserving a narrow chain from a human
 claim to revision-bound evidence removes consequential review work.
 
@@ -22,9 +24,10 @@ would not help.
 
 ## Launch queue
 
-Contact one person from each row before adding more names. Use a public channel
-they already invite; do not open an unrelated repository issue merely to reach
-someone.
+Begin with rows 1–3 only if public evidence cannot resolve a material question
+or if observing use of the Binder artifact is itself the test. Add later rows
+only to resolve a documented disagreement. Use a public channel they
+already invite; do not open an unrelated repository issue merely to reach them.
 
 | Priority | Person or route | Public work to begin from | Learning goal |
 | --- | --- | --- | --- |
@@ -105,7 +108,8 @@ maintainer/auditor case.
 
 ## Stop conditions
 
-After three conversations, pause if nobody describes manual reconstruction
-before seeing Binder. After five, apply the gates in [VALIDATION.md](VALIDATION.md).
+After three targeted conversations, pause if nobody describes manual
+reconstruction before seeing Binder. Expand to five only if roles disagree;
+then apply the gates in [VALIDATION.md](VALIDATION.md).
 Do not broaden the pitch to a marketplace, formal verification, or deployment
 automation to rescue weak demand.
