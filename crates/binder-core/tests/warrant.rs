@@ -1,8 +1,8 @@
 use std::fs;
 
 use binder_core::{
-    Claim, DependencySnapshot, Evidence, EvidenceVerdict, WarrantStatus, changed_artifacts,
-    evaluate, snapshot_dependencies,
+    Claim, DependencySnapshot, Evidence, EvidenceVerdict, ReceiptBundle, WarrantStatus,
+    changed_artifacts, evaluate, snapshot_dependencies, validate_receipt,
 };
 use tempfile::tempdir;
 
@@ -131,4 +131,59 @@ fn snapshot_identity_is_deterministic_and_path_sensitive() {
 
     assert_eq!(first.identity, second.identity);
     assert_ne!(only_a.identity, only_b.identity);
+}
+
+fn valid_receipt() -> ReceiptBundle {
+    let snapshot = DependencySnapshot {
+        identity: "inputs".into(),
+        files: [("source.rs".into(), "digest".into())].into(),
+    };
+    let observed = |trial: &str, verdict| {
+        Evidence::new(trial, verdict, snapshot.clone()).with_observation(
+            vec!["trial".into()],
+            b"stdout",
+            b"stderr",
+            Default::default(),
+        )
+    };
+    ReceiptBundle {
+        claim_id: claim().id,
+        dependencies: snapshot.clone(),
+        base: vec![
+            observed("rust-transition-proof", EvidenceVerdict::ExpectedFail),
+            observed("runtime-replay", EvidenceVerdict::ExpectedFail),
+        ],
+        head: vec![
+            observed("rust-transition-proof", EvidenceVerdict::Pass),
+            observed("runtime-replay", EvidenceVerdict::Pass),
+        ],
+        status: WarrantStatus::Warranted,
+    }
+}
+
+#[test]
+fn rejects_receipts_with_tampered_dependency_snapshots() {
+    let mut receipt = valid_receipt();
+    receipt.head[0].dependencies.identity = "forged".into();
+
+    assert!(validate_receipt(&claim(), &receipt).is_err());
+}
+
+#[test]
+fn rejects_receipts_with_missing_commands_or_duplicate_trials() {
+    let mut missing_command = valid_receipt();
+    missing_command.head[0].command.clear();
+    assert!(validate_receipt(&claim(), &missing_command).is_err());
+
+    let mut duplicate = valid_receipt();
+    duplicate.head[1].trial_id = duplicate.head[0].trial_id.clone();
+    assert!(validate_receipt(&claim(), &duplicate).is_err());
+}
+
+#[test]
+fn rejects_receipts_whose_recorded_status_does_not_match_the_evidence() {
+    let mut receipt = valid_receipt();
+    receipt.head[0].verdict = EvidenceVerdict::Fail;
+
+    assert!(validate_receipt(&claim(), &receipt).is_err());
 }
