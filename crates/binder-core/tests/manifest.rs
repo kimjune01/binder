@@ -71,3 +71,29 @@ fn rejects_claim_ids_that_can_escape_the_receipt_directory() {
 
     assert!(load_claim(dir.path(), &path).is_err());
 }
+
+#[test]
+fn rejects_v2_trials_without_an_evidence_kind() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("claim.yaml");
+    fs::write(
+        &path,
+        "version: 2\nid: x\nclaim: x\ndependencies: [claim.yaml]\nrequired_trials: [x]\ntrials:\n  - id: x\n    command: [true]\n",
+    )
+    .unwrap();
+
+    assert!(load_claim(dir.path(), &path).is_err());
+}
+
+#[test]
+fn rejects_overlay_paths_that_escape_the_worktree() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("claim.yaml");
+    fs::write(
+        &path,
+        "version: 2\nid: x\nclaim: x\ndependencies: [claim.yaml]\nrequired_trials: [x]\ntrials:\n  - id: x\n    evidence_kind: empirical\n    command: [true]\n    overlay_from_head: [../outside]\n",
+    )
+    .unwrap();
+
+    assert!(load_claim(dir.path(), &path).is_err());
+}

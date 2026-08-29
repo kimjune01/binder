@@ -357,6 +357,23 @@ pub fn load_claim(root: &Path, path: &Path) -> Result<LoadedClaim, String> {
     {
         return Err("trial commands must contain non-empty arguments".into());
     }
+    if parsed.version == 2 {
+        for trial in &parsed.trials {
+            if trial.evidence_kind.is_none() {
+                return Err(format!("v2 trial {} requires evidence_kind", trial.id));
+            }
+            for path in &trial.overlay_from_head {
+                if !is_safe_relative_path(path) {
+                    return Err(format!("overlay path must stay below the worktree: {path}"));
+                }
+                if !parsed.dependencies.contains(path) {
+                    return Err(format!(
+                        "overlay path must be a declared dependency: {path}"
+                    ));
+                }
+            }
+        }
+    }
     let path_refs = parsed
         .dependencies
         .iter()
@@ -381,12 +398,7 @@ pub fn load_claim(root: &Path, path: &Path) -> Result<LoadedClaim, String> {
 pub fn snapshot_dependencies(root: &Path, paths: &[&str]) -> io::Result<DependencySnapshot> {
     let mut normalized = BTreeSet::new();
     for path in paths {
-        let candidate = Path::new(path);
-        if candidate.is_absolute()
-            || candidate
-                .components()
-                .any(|component| matches!(component, Component::ParentDir | Component::RootDir))
-        {
+        if !is_safe_relative_path(path) {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,
                 format!("dependency path must stay below the claim root: {path}"),
@@ -412,6 +424,18 @@ pub fn snapshot_dependencies(root: &Path, paths: &[&str]) -> io::Result<Dependen
         identity: hex_digest(&preimage),
         files,
     })
+}
+
+fn is_safe_relative_path(path: &str) -> bool {
+    let candidate = Path::new(path);
+    !path.is_empty()
+        && !candidate.is_absolute()
+        && !candidate.components().any(|component| {
+            matches!(
+                component,
+                Component::ParentDir | Component::RootDir | Component::Prefix(_)
+            )
+        })
 }
 
 pub fn changed_artifacts(root: &Path, evidence: &[Evidence]) -> io::Result<Vec<String>> {

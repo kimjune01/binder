@@ -249,7 +249,7 @@ fn execute_typed(root: &Path, trial: &binder_core::Trial) -> TypedOutcome {
             .rev()
             .find(|line| !line.is_empty())
             .and_then(|line| serde_json::from_slice::<serde_json::Value>(line).ok());
-        let observation = parsed
+        let mut observation = parsed
             .as_ref()
             .and_then(|value| value.get("observation"))
             .and_then(|value| serde_json::from_value(value.clone()).ok())
@@ -257,6 +257,9 @@ fn execute_typed(root: &Path, trial: &binder_core::Trial) -> TypedOutcome {
         let witness = parsed
             .and_then(|value| value.get("witness").cloned())
             .unwrap_or(serde_json::Value::Null);
+        if observation != Observation::NoVerdict && !witness.is_object() {
+            observation = Observation::NoVerdict;
+        }
         (ExecutionOutcome::Completed, observation, witness)
     } else {
         (

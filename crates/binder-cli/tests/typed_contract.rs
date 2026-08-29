@@ -140,3 +140,15 @@ fn malformed_success_is_not_inferred_to_have_stood() {
     assert_eq!(json["trials"][0]["base"]["observation"], "no-verdict");
     assert_eq!(json["policy"], "not-warranted");
 }
+
+#[test]
+fn observation_without_a_structured_witness_is_no_verdict() {
+    let (dir, base, head) =
+        fixture("#!/usr/bin/env bash\nprintf '%s\\n' '{\"observation\":\"stood\"}'\n");
+    let output = verify(dir.path(), &base, &head);
+    assert_eq!(output.status.code(), Some(1));
+    let json = document(&output);
+    assert_eq!(json["trials"][0]["base"]["execution"], "completed");
+    assert_eq!(json["trials"][0]["base"]["observation"], "no-verdict");
+    assert_eq!(json["policy"], "not-warranted");
+}
