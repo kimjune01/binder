@@ -25,7 +25,10 @@ if ! command -v cargo-build-sbf >/dev/null 2>&1 || \
   cargo install cargo-build-sbf --version "$expected_sbf_builder" --locked
 fi
 
-bash scripts/mollusk-trial.sh vulnerable
+if bash scripts/mollusk-trial.sh vulnerable; then
+  echo "expected vulnerable runtime trial to fail" >&2
+  exit 1
+fi
 bash scripts/mollusk-trial.sh fixed
 cargo test --workspace --locked
 cargo run --quiet --locked -p binder-cli -- verify "$claim"
