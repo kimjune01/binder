@@ -1,5 +1,8 @@
 # Binder validation study
 
+[OUTREACH.md](OUTREACH.md) contains the conversational invitations and moderated
+demo script used to recruit and run these sessions.
+
 ## Decision
 
 Do not build `binder init`, release packaging, a registry, or deployment integrations until this study shows that Binder improves a real review decision.

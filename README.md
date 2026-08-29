@@ -13,6 +13,8 @@ The original, deeper demonstrator compares a deliberately broken Solana vault re
 See [PRODUCT.md](PRODUCT.md) for the canonical product framing and scope, and
 [VISION.md](VISION.md) for the longer-term vision of independently verified
 agreements.
+See [OUTREACH.md](OUTREACH.md) for the soft-discovery and demo conversations
+used to test the product with contract maintainers and auditors.
 
 ## Reproduce
 
