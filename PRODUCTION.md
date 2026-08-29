@@ -21,7 +21,7 @@ Start with Solana teams that upgrade an audited program frequently. Do not optim
 ## Production workflow
 
 ```text
-claim manifest + repository change
+issue/PR claim + repository change
                 |
                 v
        binder verify in CI
@@ -47,10 +47,10 @@ The CLI and receipt remain authoritative and independently replayable. The hoste
 
 ### Repository experience
 
-- `binder init` creates a claim from a small template.
+- Binder accepts a small explicit manifest or a machine claim compiled from issue/PR metadata.
 - Stable claim schema names the statement, subject repository, base/head revisions, dependencies, trials, and artifacts.
 - `binder verify` supports machine-readable JSON as well as the terminal report.
-- An official GitHub Action installs Binder, runs verification, uploads the replay bundle, and publishes a Check Run summary.
+- An official GitHub Action installs Binder, runs verification, uploads the replay bundle, reports a status check, and writes the job summary.
 - Released binaries and pinned Action versions remove the need to compile Binder in every repository.
 - Clear `WARRANTED`, `FAILED`, `STALE`, and `UNSUPPORTED` exit behavior is documented for release gates.
 
@@ -83,8 +83,8 @@ GET /v1/receipts/{digest}/bundle
 
 1. Apply Binder to three real program upgrades from design partners.
 2. Observe the authoring, review, replay, and deployment workflow end to end.
-3. Add `binder init`, JSON output, stable exit codes, and a versioned schema.
-4. Package an official GitHub Action and downloadable CLI binaries.
+3. Validate explicit manifests against claims compiled from issue/PR metadata; build `binder init` only if manual authoring is the observed constraint.
+4. Package an official GitHub Action and downloadable CLI binaries after the workflow passes the validation gate.
 5. Measure setup time, replay success, reviewer comprehension, and stale claims caught.
 
 Exit gate: at least three teams complete a real upgrade; two choose to keep Binder enabled; a new claim takes under 15 minutes to configure when a suitable check already exists; and at least 80% of clean CI replays succeed without intervention.
@@ -145,9 +145,10 @@ The primary metric is **program upgrades reviewed with current Binder claims**, 
 ## Immediate implementation sequence
 
 1. ~~Freeze and document receipt schema v1, CLI exit codes, and JSON output contract.~~
-2. Add failing acceptance tests for `binder init`.
-3. Implement that CLI surface and release cross-platform binaries.
-4. Build the GitHub Action against the released binary.
-5. Onboard the first real repository before starting the registry.
+2. Define the PR claim convention, real Git base/candidate identity, and test-only-patch behavior in validation fixtures.
+3. Run the paired review study using the existing CLI and manually prepared claims.
+4. If authoring cost is the demonstrated constraint, add failing acceptance tests for `binder init` or PR-to-claim compilation.
+5. Only after the study passes, release cross-platform binaries and build the GitHub Action.
+6. Onboard the first real repository before starting the registry.
 
-This sequence keeps the next milestone falsifiable: if teams will not maintain claims in their own repositories, a hosted registry will not rescue the product.
+This sequence keeps the next milestone falsifiable: if the claim–evidence relationship does not improve decisions inside the existing pull-request workflow, a new interface or hosted registry will not rescue the product.

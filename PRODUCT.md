@@ -75,25 +75,120 @@ The differentiated operations are therefore:
 
 Running tests is commodity infrastructure. Maintaining the claim–evidence–subject relationship is the product.
 
+## Interface strategy
+
+Binder should add epistemic semantics to interfaces teams already use. It should not ask authors or reviewers to move into a parallel knowledge system.
+
+```text
+issue or PR
+  supplies the claim
+        |
+existing test runner
+  supplies the check
+        |
+Git base/head commits
+  supply the subject
+        |
+GitHub required check
+  supplies the merge decision
+        |
+job summary + workflow artifact
+  supply explanation and replay
+        |
+deployment protection + verified build
+  later connect the claim to what ships
+```
+
+### Claim authoring: issues and pull requests
+
+The human-facing claim should begin in the issue acceptance criteria, audit finding, bug report, or pull-request description where teams already state intent. A Binder manifest is the compiled machine representation of that intent, not necessarily a document a maintainer writes by hand.
+
+The initial convention can be as small as:
+
+```markdown
+Claim: A rejected withdrawal does not change balances.
+Fixes: #142
+```
+
+Binder or the producing agent may turn this into a versioned repository artifact. Validation must determine whether teams prefer to commit that artifact, generate it in CI, or maintain a small explicit manifest.
+
+### Checks: existing test runners
+
+The falsifiable check remains an ordinary `cargo test`, Mollusk, pytest, Jest, Certora, or other project command. Binder supplies revision contrast, expected outcomes, rooted inputs, and receipt semantics around the command. It must not introduce a testing language.
+
+### Subject identity: Git
+
+The subject is the actual pull-request base SHA and candidate SHA, or the merge-group SHA where repositories use a merge queue. Binder must adopt the repository host's revision semantics rather than use symbolic labels such as `vulnerable` and `fixed`.
+
+When a new regression test is part of the candidate, Binder needs a defined test-only-patch mechanism so the same check can run meaningfully against the base revision.
+
+### Review and gating: GitHub checks
+
+The primary product surface is a required status check beside existing build and test checks. Its detailed explanation belongs in the GitHub job summary first; a custom Check Run or GitHub App is justified only if annotations or richer interaction prove necessary.
+
+```text
+PASS  build
+PASS  unit-tests
+PASS  binder/claims
+```
+
+The check status gates merge. The summary communicates the claim, contrast, evidence boundary, freshness, and replay cost. Reviewers should not need to visit a Binder dashboard.
+
+### Replay transport: workflow artifacts
+
+The replay bundle should initially ship as a normal GitHub Actions artifact. This fits existing log and test-result workflows but has finite retention, so durable receipts may later attach to a release or content-addressed object store. Artifact upload is the adoption interface; permanent storage is a later lifecycle decision.
+
+### Provenance: existing attestations
+
+GitHub artifact attestations, in-toto, or SLSA should establish that a workflow produced a particular receipt or binary. Binder should not replace them with a bespoke signing layer.
+
+The distinction is:
+
+- provenance attestation: this workflow produced this artifact;
+- Binder receipt: this observation supports this claim under these roots.
+
+### Release and deployment: existing gates
+
+After the pull-request workflow is validated, the same claim status can feed a GitHub deployment protection rule. For Solana, verified-build metadata supplies the source-commit-to-deployed-ELF edge. Binder supplies the semantic-claim-to-ELF edge above it.
+
+```text
+claim warranted for ELF digest X
+                 +
+deployed program matches ELF digest X
+                 =
+claim evidence reaches the deployed subject
+```
+
+Program metadata and explorers are later discovery interfaces. They should consume Binder receipts only after repositories produce useful ones.
+
+### Interfaces to avoid initially
+
+- **SARIF:** it is finding- and source-location-oriented, while Binder tracks standing semantic claims.
+- **Standalone dashboard:** it duplicates the pull-request surface before demand exists.
+- **Custom test DSL:** it competes with the evidence producers Binder should compose.
+- **On-chain claim registry:** it adds permanence and governance before the claim contract is validated.
+- **Bespoke agent protocol:** agents can invoke the CLI and consume JSON through existing tool access.
+
 ## v1 scope: evidence-carrying changes
 
 ### Must have
 
-- Repository-committed, versioned claim manifests.
+- A versioned machine claim compiled from an issue, pull request, audit finding, or small explicit manifest.
 - Real repository base and candidate revision identity.
 - Explicit expected outcomes and claim-specific observations.
-- Commands executed locally or in the repository owner's CI.
+- Existing project commands executed locally or in the repository owner's CI.
 - Versioned, deterministic, content-addressed receipts.
 - Declared source, toolchain, fixture, environment, and artifact roots.
 - Accurate invalidation when a relevant root changes.
 - Human-readable and JSON reports with stable exit behavior.
 - A generic replay contract that does not depend on Binder's demo scripts.
+- An official GitHub Action that reports a required check, writes the job summary, and uploads the replay bundle as a workflow artifact.
 - A receiver can validate and replay without a hosted Binder service.
 
 ### Should have after validation
 
 - `binder init` for turning an existing regression check into a claim.
-- Released CLI binaries and an official GitHub Action.
+- Released CLI binaries.
 - Review output showing claim, boundary, base/candidate contrast, freshness, and replay cost.
 - Adapters that normalize observations from existing tools without collapsing their guarantees.
 
@@ -198,6 +293,6 @@ Those descriptions either broaden the guarantee beyond the evidence or lead with
 4. Which roots can be discovered automatically without hiding consequential assumptions?
 5. How often will receivers actually replay, and is credible replayability valuable even when they do not?
 6. Is the first durable workflow audit remediation, agent-authored regression repair, or both?
+7. Should the machine claim be committed, generated from PR metadata, or both?
 
 These are validation questions. Product work should answer them with real review behavior before adding hosted infrastructure.
-
