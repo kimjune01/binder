@@ -15,6 +15,9 @@ See [PRODUCT.md](PRODUCT.md) for the canonical product framing and scope, and
 agreements.
 See [OUTREACH.md](OUTREACH.md) for the soft-discovery and demo conversations
 used to test the product with contract maintainers and auditors.
+The [five-case public research hub](hub/README.md) organizes real audit,
+verification, proof-scope, and postmortem artifacts into source-traceable case
+fixtures with explicit missing edges.
 
 ## Reproduce
 
