@@ -60,6 +60,14 @@ fn verify(root: &std::path::Path, base: &str, head: &str) -> Output {
         .unwrap()
 }
 
+fn verify_text(root: &std::path::Path, base: &str, head: &str) -> Output {
+    Command::new(env!("CARGO_BIN_EXE_binder-cli"))
+        .args(["verify", "claim.yaml", "--base", base, "--head", head])
+        .current_dir(root)
+        .output()
+        .unwrap()
+}
+
 fn document(output: &Output) -> Value {
     serde_json::from_slice(&output.stdout).unwrap_or_else(|error| {
         panic!(
@@ -103,6 +111,23 @@ fi
     assert_eq!(json["freshness"], "current");
     assert_eq!(json["policy"], "warranted");
     assert_eq!(json["receipt_digest"].as_str().unwrap().len(), 64);
+}
+
+#[test]
+fn human_report_leads_with_the_authored_rule() {
+    let check = r#"#!/usr/bin/env bash
+if grep -q '^fixed$' behavior.txt; then
+  echo '{"observation":"stood","witness":{"actual":"fixed"}}'
+else
+  echo '{"observation":"refuted","witness":{"actual":"buggy"}}'
+fi
+"#;
+    let (dir, base, head) = fixture(check);
+    let output = verify_text(dir.path(), &base, &head);
+    assert!(output.status.success());
+    let report = String::from_utf8(output.stdout).unwrap();
+    assert!(report.starts_with("WARRANTED\nClaim"));
+    assert!(report.contains("Rule   fixture-maintainer: base refuted → head stood"));
 }
 
 #[test]

@@ -27,6 +27,16 @@ fn run() -> Result<(), String> {
         [command, claim_path, flag, value] if flag == "--format" && value == "json" => {
             (command, claim_path, OutputFormat::Json, None)
         }
+        [command, claim_path, base_flag, base, head_flag, head]
+            if base_flag == "--base" && head_flag == "--head" =>
+        {
+            (
+                command,
+                claim_path,
+                OutputFormat::Text,
+                Some((base.as_str(), head.as_str())),
+            )
+        }
         [
             command,
             claim_path,
