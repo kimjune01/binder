@@ -1,5 +1,8 @@
 # Binder outreach guide
 
+For the ready-to-run prospect queue, personalized messages, public case, and
+moderator sheet, start with [FIRST_CONVERSATIONS.md](FIRST_CONVERSATIONS.md).
+
 ## Purpose
 
 Use outreach to learn whether Binder removes work from consequential contract
