@@ -148,6 +148,8 @@ fn valid_receipt() -> ReceiptBundle {
         )
     };
     ReceiptBundle {
+        schema_version: 1,
+        binder_version: env!("CARGO_PKG_VERSION").into(),
         claim_id: claim().id,
         dependencies: snapshot.clone(),
         base: vec![
@@ -160,6 +162,17 @@ fn valid_receipt() -> ReceiptBundle {
         ],
         status: WarrantStatus::Warranted,
     }
+}
+
+#[test]
+fn rejects_receipts_from_an_unknown_schema_version() {
+    let mut receipt = valid_receipt();
+    receipt.schema_version = 2;
+
+    assert_eq!(
+        validate_receipt(&claim(), &receipt).unwrap_err(),
+        "unsupported receipt schema version: 2"
+    );
 }
 
 #[test]

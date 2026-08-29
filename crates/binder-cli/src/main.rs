@@ -7,8 +7,8 @@ use std::path::Path;
 use std::process::Command;
 
 use binder_core::{
-    Evidence, EvidenceVerdict, ReceiptBundle, WarrantStatus, changed_artifacts, evaluate,
-    load_claim, render_report, validate_receipt,
+    BINDER_VERSION, Evidence, EvidenceVerdict, RECEIPT_SCHEMA_VERSION, ReceiptBundle,
+    WarrantStatus, changed_artifacts, evaluate, load_claim, render_report, validate_receipt,
 };
 
 fn main() {
@@ -82,6 +82,8 @@ fn verify(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
 
     let warrant = evaluate(&loaded.claim, &loaded.snapshot, &base, &head);
     let bundle = ReceiptBundle {
+        schema_version: RECEIPT_SCHEMA_VERSION,
+        binder_version: BINDER_VERSION.into(),
         claim_id: loaded.claim.id.clone(),
         dependencies: loaded.snapshot.clone(),
         base: base.clone(),

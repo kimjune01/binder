@@ -9,6 +9,9 @@ use std::path::{Component, Path};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
+pub const RECEIPT_SCHEMA_VERSION: u32 = 1;
+pub const BINDER_VERSION: &str = env!("CARGO_PKG_VERSION");
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Claim {
     pub id: String,
@@ -122,6 +125,8 @@ pub enum WarrantStatus {
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ReceiptBundle {
+    pub schema_version: u32,
+    pub binder_version: String,
     pub claim_id: String,
     pub dependencies: DependencySnapshot,
     pub base: Vec<Evidence>,
@@ -137,6 +142,12 @@ pub struct Warrant {
 }
 
 pub fn validate_receipt(claim: &Claim, bundle: &ReceiptBundle) -> Result<(), String> {
+    if bundle.schema_version != RECEIPT_SCHEMA_VERSION {
+        return Err(format!(
+            "unsupported receipt schema version: {}",
+            bundle.schema_version
+        ));
+    }
     if bundle.claim_id != claim.id {
         return Err("receipt claim id does not match requested claim".into());
     }
