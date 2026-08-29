@@ -29,12 +29,18 @@ The hypothesis is:
 
 ## Method
 
-Run five paired, moderated review sessions using real fixes. Each session uses two comparable fixes or two reviewers of the same fix:
+Prepare five paired, self-contained review tasks using real fixes. Each task
+compares:
 
 - **Control:** normal PR description, diff, and CI/test output.
 - **Binder:** the same material plus the Binder report and replay bundle.
 
-Alternate which condition appears first. Do not explain Binder before the participant makes an initial interpretation; the report must carry its own meaning.
+Use asynchronous tasks first and alternate which condition appears first. Do
+not explain Binder before the participant makes an initial interpretation; the
+report must carry its own meaning. Prefer observable submitted answers,
+reproduction logs, corrections, citations, and repository changes. Run at most
+three moderated cold-reader sessions only when asynchronous evidence is sparse
+or tacit workflow and timing cannot otherwise be observed.
 
 Use real changes from repositories the participant understands. Prefer agent-authored regression fixes involving payments, authorization, accounting, migrations, or state transitions. At least two cases should contain a seeded review problem:
 

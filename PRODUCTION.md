@@ -1,5 +1,10 @@
 # Binder production plan
 
+> **Ordering note:** [ROADMAP.md](ROADMAP.md) is authoritative for product
+> sequencing. This document describes a possible later hosted architecture.
+> The registry and public API are conditional on retained local receipt use and
+> third-party retrieval; they are not the first production product.
+
 This plan is subordinate to the product boundary in [PRODUCT.md](PRODUCT.md) and the validation gate in [VALIDATION.md](VALIDATION.md).
 
 ## Product outcome
@@ -8,7 +13,11 @@ Binder should help a Solana maintainer answer one release question:
 
 > Which important claims still hold for the program we are about to deploy, and what can another reviewer replay?
 
-The first production product is a GitHub-native release check plus a public, read-only program-status API. Verification runs in the program owner's CI or workstation. Binder stores and serves receipts; it does not execute untrusted customer code.
+If retained local use creates enough public receipt supply, a later hosted
+product may combine a GitHub-native release check with a read-only
+program-status API. Verification still runs in the program owner's CI or
+workstation. Binder stores and serves receipts; it does not execute untrusted
+customer code.
 
 ## Initial users
 
