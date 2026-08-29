@@ -82,12 +82,14 @@ fn verify_typed(
     head: &str,
     format: OutputFormat,
 ) -> Result<(), String> {
+    let base = resolve_revision(root, base)?;
+    let head = resolve_revision(root, head)?;
     let temporary =
         tempfile::tempdir().map_err(|error| format!("create worktree area: {error}"))?;
     let base_root = temporary.path().join("base");
     let head_root = temporary.path().join("head");
-    add_worktree(root, &base_root, base)?;
-    if let Err(error) = add_worktree(root, &head_root, head) {
+    add_worktree(root, &base_root, &base)?;
+    if let Err(error) = add_worktree(root, &head_root, &head) {
         remove_worktree(root, &base_root);
         return Err(error);
     }
@@ -126,8 +128,8 @@ fn verify_typed(
             claim_id: loaded.claim.id.clone(),
             statement: loaded.claim.statement.clone(),
             subject: Subject {
-                base: base.into(),
-                head: head.into(),
+                base: base.clone(),
+                head: head.clone(),
             },
             trials,
             freshness: Freshness::Current,
@@ -174,6 +176,18 @@ fn verify_typed(
         std::process::exit(1);
     }
     Ok(())
+}
+
+fn resolve_revision(repo: &Path, revision: &str) -> Result<String, String> {
+    let output = Command::new("git")
+        .args(["rev-parse", "--verify", &format!("{revision}^{{commit}}")])
+        .current_dir(repo)
+        .output()
+        .map_err(|error| format!("resolve revision {revision}: {error}"))?;
+    if !output.status.success() {
+        return Err(format!("unknown revision: {revision}"));
+    }
+    Ok(String::from_utf8_lossy(&output.stdout).trim().into())
 }
 
 fn add_worktree(repo: &Path, path: &Path, revision: &str) -> Result<(), String> {
