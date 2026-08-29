@@ -99,6 +99,35 @@ deployment protection + verified build
   later connect the claim to what ships
 ```
 
+### Native interface: an agent-first CLI
+
+The CLI is Binder's product interface. Agents already know how to invoke commands, provide files and revisions, inspect exit codes, and pass structured output to the next tool. GitHub Actions, editor integrations, MCP tools, and hosted services should be thin adapters over the same CLI contract rather than independent implementations of Binder semantics.
+
+Agent-friendly means:
+
+- **Non-interactive:** every operation completes without prompts; consequential choices are explicit arguments or files.
+- **Structured:** `--format json` covers successful, non-warranted, and operational-error results with a versioned schema.
+- **Stream-safe:** stdout contains only the requested result; diagnostics and trial output go to stderr.
+- **Stable:** documented exit codes and field meanings do not depend on terminal wording.
+- **Deterministic:** identical rooted inputs produce identical receipt identity and machine output, excluding explicitly separated run metadata.
+- **Composable:** commands accept repository paths, Git revisions, claim files, and receipt digests rather than hidden session state.
+- **Inspectable:** an agent can ask what Binder will run, which roots it resolved, and which artifacts it expects before executing trials.
+- **Bounded:** timeouts, replay cost, and unsupported states are explicit rather than appearing as a generic failure or hanging forever.
+- **Local-first:** verification and receipt validation work without a Binder account or hosted service.
+
+The intended command surface is small:
+
+```text
+binder verify   <claim> --base <rev> --head <rev> [--format json]
+binder status   <claim>                          [--format json]
+binder inspect  <claim>                          [--format json]
+binder replay   <receipt>                        [--format json]
+```
+
+`inspect` resolves the subject, commands, roots, artifacts, and estimated replay work without running evidence producers. `replay` consumes an existing receipt or bundle and re-derives its verdict. Claim compilation or `init` remains undecided until validation establishes the right authoring source.
+
+Human terminal reports are a rendering of the machine contract. They are not a separate semantic interface.
+
 ### Claim authoring: issues and pull requests
 
 The human-facing claim should begin in the issue acceptance criteria, audit finding, bug report, or pull-request description where teams already state intent. A Binder manifest is the compiled machine representation of that intent, not necessarily a document a maintainer writes by hand.
@@ -181,6 +210,7 @@ Program metadata and explorers are later discovery interfaces. They should consu
 - Declared source, toolchain, fixture, environment, and artifact roots.
 - Accurate invalidation when a relevant root changes.
 - Human-readable and JSON reports with stable exit behavior.
+- Non-interactive `verify`, `status`, `inspect`, and `replay` operations whose JSON covers all terminal outcomes.
 - A generic replay contract that does not depend on Binder's demo scripts.
 - An official GitHub Action that reports a required check, writes the job summary, and uploads the replay bundle as a workflow artifact.
 - A receiver can validate and replay without a hosted Binder service.
@@ -247,6 +277,7 @@ This framing should acknowledge the assurance-case lineage rather than claim the
 
 - As a maintainer, I want to know whether a proposed check fails on the buggy revision so that I do not mistake a generic green test for evidence of the fix.
 - As a receiving agent, I want the claim, roots, command, and oracle in a machine-readable record so that I can inherit work without trusting the producing agent's summary.
+- As an agent, I want a non-interactive inspection command and stable JSON errors so that I can plan, execute, and recover without parsing human terminal text.
 - As a release owner, I want prior evidence to become stale when relevant inputs change so that old approval does not silently cover new code.
 - As an auditor performing fix review, I want to see which claim and revision each check addresses so that I can focus renewed review on the affected assurance boundary.
 - As a skeptical reviewer, I want a one-command replay so that I can challenge the result without Binder's service or the original author.

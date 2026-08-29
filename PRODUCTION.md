@@ -113,8 +113,8 @@ These remain contingent on consumers using the API; do not build wallet UI or a 
 
 | Component | Responsibility | Suggested implementation |
 | --- | --- | --- |
-| Binder CLI | Parse, execute, normalize, validate, render | Existing Rust workspace |
-| GitHub Action | Install CLI, invoke it, upload/publish outputs | Thin composite or JavaScript action |
+| Binder CLI | Own all claim, execution, receipt, replay, status, and machine-interface semantics | Existing Rust workspace |
+| GitHub Action | Install and invoke the CLI, then map its outputs into GitHub surfaces | Thin composite or JavaScript action |
 | Registry API | Validate uploads, index metadata, serve queries | Small stateless service |
 | Metadata index | Programs, claims, revisions, receipt pointers | PostgreSQL |
 | Bundle store | Immutable receipts, inputs, and raw output | S3-compatible object storage |
