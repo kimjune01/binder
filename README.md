@@ -27,3 +27,4 @@ Each verification writes a content-addressed directory under `.binder/receipts/`
 `WARRANTED` means every required trial distinguished the broken base from the fixed head over the exact recorded inputs, and those inputs and compiled artifacts remain current. The Rust trial is bounded exhaustive evidence, not an unbounded formal proof. The runtime trial is a local Mollusk execution, not deployed-program identity or a general audit.
 
 See [DEMO.md](DEMO.md) for the goal and [AUDIT.md](AUDIT.md) for the acceptance-criteria audit.
+See [PRODUCTION.md](PRODUCTION.md) for the staged plan from local demo to a GitHub workflow and public program-status API.
