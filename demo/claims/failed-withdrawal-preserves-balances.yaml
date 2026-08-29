@@ -10,4 +10,8 @@ dependencies:
 required_trials:
   - rust-transition-proof
   - runtime-replay
-
+trials:
+  - id: rust-transition-proof
+    command: ["cargo", "run", "--quiet", "-p", "vault-transition", "--bin", "vault-trial", "--", "proof", "{revision}"]
+  - id: runtime-replay
+    command: ["cargo", "run", "--quiet", "-p", "vault-transition", "--bin", "vault-trial", "--", "runtime", "{revision}"]

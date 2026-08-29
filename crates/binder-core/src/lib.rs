@@ -20,6 +20,14 @@ pub struct LoadedClaim {
     pub claim: Claim,
     pub dependency_paths: Vec<String>,
     pub snapshot: DependencySnapshot,
+    pub trials: Vec<Trial>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Trial {
+    pub id: String,
+    pub command: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -30,6 +38,7 @@ struct ClaimFile {
     claim: String,
     dependencies: Vec<String>,
     required_trials: Vec<String>,
+    trials: Vec<Trial>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
@@ -67,12 +76,22 @@ impl Evidence {
     }
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum WarrantStatus {
     Warranted,
     Failed,
     Stale,
     Unsupported,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+pub struct ReceiptBundle {
+    pub claim_id: String,
+    pub dependencies: DependencySnapshot,
+    pub base: Vec<Evidence>,
+    pub head: Vec<Evidence>,
+    pub status: WarrantStatus,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -95,6 +114,23 @@ pub fn load_claim(root: &Path, path: &Path) -> Result<LoadedClaim, String> {
     if parsed.required_trials.is_empty() {
         return Err("claim must require at least one trial".into());
     }
+    let defined_trials = parsed
+        .trials
+        .iter()
+        .map(|trial| trial.id.as_str())
+        .collect::<BTreeSet<_>>();
+    for required in &parsed.required_trials {
+        if !defined_trials.contains(required.as_str()) {
+            return Err(format!("required trial has no definition: {required}"));
+        }
+    }
+    if parsed
+        .trials
+        .iter()
+        .any(|trial| trial.command.is_empty() || trial.command.iter().any(String::is_empty))
+    {
+        return Err("trial commands must contain non-empty arguments".into());
+    }
     let path_refs = parsed
         .dependencies
         .iter()
@@ -110,6 +146,7 @@ pub fn load_claim(root: &Path, path: &Path) -> Result<LoadedClaim, String> {
         },
         dependency_paths: parsed.dependencies,
         snapshot,
+        trials: parsed.trials,
     })
 }
 
@@ -152,7 +189,7 @@ pub fn snapshot_dependencies(root: &Path, paths: &[&str]) -> io::Result<Dependen
 pub fn evaluate(
     claim: &Claim,
     current: &DependencySnapshot,
-    _base_evidence: &[Evidence],
+    base_evidence: &[Evidence],
     head_evidence: &[Evidence],
 ) -> Warrant {
     let changed_dependencies = changed_dependencies(current, head_evidence);
@@ -160,6 +197,18 @@ pub fn evaluate(
         return Warrant {
             status: WarrantStatus::Stale,
             changed_dependencies,
+            missing_trials: Vec::new(),
+        };
+    }
+
+    if !base_evidence.is_empty()
+        && base_evidence
+            .iter()
+            .any(|item| item.verdict != EvidenceVerdict::ExpectedFail)
+    {
+        return Warrant {
+            status: WarrantStatus::Failed,
+            changed_dependencies: Vec::new(),
             missing_trials: Vec::new(),
         };
     }

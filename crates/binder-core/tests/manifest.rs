@@ -16,6 +16,7 @@ fn parses_the_demo_claim_and_renders_a_reviewer_sized_warrant() {
             .dependency_paths
             .contains(&"rust-toolchain.toml".to_owned())
     );
+    assert_eq!(manifest.trials.len(), 2);
 
     let evidence = manifest
         .claim
@@ -40,7 +41,7 @@ fn rejects_unknown_manifest_fields() {
     let path = dir.path().join("claim.yaml");
     fs::write(
         &path,
-        "version: 1\nid: x\nclaim: x\ndependencies: []\nrequired_trials: []\nsurprise: true\n",
+        "version: 1\nid: x\nclaim: x\ndependencies: []\nrequired_trials: []\ntrials: []\nsurprise: true\n",
     )
     .unwrap();
 
