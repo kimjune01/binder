@@ -18,6 +18,8 @@ For a quick status check after verification:
 cargo run --quiet --locked -p binder-cli -- status demo/claims/failed-withdrawal-preserves-balances.yaml
 ```
 
+The report includes the human-readable claim, the expected base failure, the fixed-head result, and each required evidence row. In GitHub Actions, `verify` and `status` also append the same report to the job summary through `GITHUB_STEP_SUMMARY`; no separate formatter is required.
+
 Each verification writes a content-addressed directory under `.binder/receipts/` containing the normalized receipt, declared inputs, raw trial output, and standalone replay instructions. Generated receipts and build products are intentionally ignored by Git.
 
 ## Guarantee boundary
