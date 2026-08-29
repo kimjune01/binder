@@ -24,9 +24,9 @@
   ],
   "missing_edges": ["A preserved base witness showing that the stale approval succeeds on the audited revision.", "A source/build/deployment identity linking the reviewed remediation to a live program."],
   "packets": {
-    "control":"hub/src/content/packets/solana-stale-cancel/control.md",
-    "curated":"hub/src/content/packets/solana-stale-cancel/curated.md",
-    "questions":"hub/src/content/packets/solana-stale-cancel/questions.md",
-    "answer_key":"hub/src/content/packets/solana-stale-cancel/answer-key.md"
+    "control":"hub/src/data/packets/solana-stale-cancel/control.md",
+    "curated":"hub/src/data/packets/solana-stale-cancel/curated.md",
+    "questions":"hub/src/data/packets/solana-stale-cancel/questions.md",
+    "answer_key":"hub/src/data/packets/solana-stale-cancel/answer-key.md"
   }
 }

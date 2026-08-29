@@ -1,0 +1,11 @@
+{
+  "name": "binder",
+  "private": true,
+  "scripts": {
+    "hub:dev": "pnpm --filter binder-hub dev",
+    "hub:test": "pnpm --filter binder-hub test",
+    "hub:typecheck": "pnpm --filter binder-hub typecheck",
+    "hub:build": "pnpm --filter binder-hub build"
+  },
+  "packageManager": "pnpm@10.23.0"
+}

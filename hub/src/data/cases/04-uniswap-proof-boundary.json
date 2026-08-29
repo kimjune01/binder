@@ -24,9 +24,9 @@
   ],
   "missing_edges": ["A contract-level specification and proof for the fee-adjusted constant-product invariant across calls.", "A proof regenerated for token implementations that deviate from the assumed semantics."],
   "packets": {
-    "control":"hub/src/content/packets/uniswap-proof-boundary/control.md",
-    "curated":"hub/src/content/packets/uniswap-proof-boundary/curated.md",
-    "questions":"hub/src/content/packets/uniswap-proof-boundary/questions.md",
-    "answer_key":"hub/src/content/packets/uniswap-proof-boundary/answer-key.md"
+    "control":"hub/src/data/packets/uniswap-proof-boundary/control.md",
+    "curated":"hub/src/data/packets/uniswap-proof-boundary/curated.md",
+    "questions":"hub/src/data/packets/uniswap-proof-boundary/questions.md",
+    "answer_key":"hub/src/data/packets/uniswap-proof-boundary/answer-key.md"
   }
 }

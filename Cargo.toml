@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/binder-core", "crates/binder-cli", "crates/binder-hub", "crates/vault-transition", "crates/vault-program", "crates/vault-mollusk"]
+members = ["crates/binder-core", "crates/binder-cli", "crates/vault-transition", "crates/vault-program", "crates/vault-mollusk"]
 resolver = "2"
 
 [workspace.package]

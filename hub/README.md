@@ -3,15 +3,18 @@
 This is the five-case Phase 0 research hub defined in [ROADMAP.md](../ROADMAP.md).
 It is a sourced static collection, not a registry or safety-status service.
 
-Build it with:
+Install and build it from the repository root:
 
 ```sh
-cargo run --quiet -p binder-hub
+pnpm install
+pnpm hub:build
 ```
 
-Then open `hub/dist/index.html`. Pass another output directory as the first
-argument to render elsewhere.
+For local development, first check whether port 4321 is free, then run
+`pnpm hub:dev`. The production build is emitted to `hub/dist/`.
 
 Each JSON fixture has four validation packets: raw-source control, curated
 view, fixed questions, and answer key. Factual edges require citations;
-inferred and missing edges remain visibly labeled.
+inferred and missing edges remain visibly labeled. Rust remains the Binder CLI
+and receipt implementation; versioned JSON is the interface between it and the
+Astro hub.

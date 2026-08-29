@@ -25,9 +25,9 @@
   ],
   "missing_edges": ["An independently justified trust policy for the compiler/build image.", "A behavioral claim and evidence about what the reproduced contract does."],
   "packets": {
-    "control":"hub/src/content/packets/stellar-reproducible-wasm/control.md",
-    "curated":"hub/src/content/packets/stellar-reproducible-wasm/curated.md",
-    "questions":"hub/src/content/packets/stellar-reproducible-wasm/questions.md",
-    "answer_key":"hub/src/content/packets/stellar-reproducible-wasm/answer-key.md"
+    "control":"hub/src/data/packets/stellar-reproducible-wasm/control.md",
+    "curated":"hub/src/data/packets/stellar-reproducible-wasm/curated.md",
+    "questions":"hub/src/data/packets/stellar-reproducible-wasm/questions.md",
+    "answer_key":"hub/src/data/packets/stellar-reproducible-wasm/answer-key.md"
   }
 }

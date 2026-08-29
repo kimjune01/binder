@@ -1,3 +1,6 @@
 /target
 /.binder
 /hub/dist
+/hub/node_modules
+/hub/.astro
+/node_modules

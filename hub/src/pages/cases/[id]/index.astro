@@ -1,0 +1,66 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import { loadCases, type PublicCase } from "../../../lib/cases";
+
+export async function getStaticPaths() {
+  return (await loadCases()).map((item) => ({ params: { id: item.id }, props: { item } }));
+}
+
+interface Props { item: PublicCase }
+const { item } = Astro.props;
+const artifactById = new Map(item.artifacts.map((artifact) => [artifact.id, artifact]));
+---
+
+<Layout title={`${item.title} — Binder`} description={item.summary}>
+  <nav><a href="/">← All cases</a><a href={`/cases/${item.id}/case.json`}>JSON</a></nav>
+
+  <header class="hero case-hero">
+    <p class="eyebrow">{item.ecosystem} · {item.class.replaceAll("-", " / ")}</p>
+    <h1>{item.title}</h1>
+    <p class="lede">{item.summary}</p>
+  </header>
+
+  <main class="case-body">
+    <section><h2>Claim</h2><p>{item.claim}</p></section>
+    <section><h2>Decision</h2><p>{item.decision.question}</p><p><strong>Expected:</strong> {item.decision.expected}</p></section>
+    <section><h2>Evidence boundary</h2><p>{item.evidence_boundary}</p></section>
+
+    <section>
+      <h2>Public artifacts</h2>
+      <ul class="artifacts">
+        {item.artifacts.map((artifact) => (
+          <li><span>{artifact.kind}</span><a href={artifact.url}>{artifact.title}</a>{artifact.revision && <code>{artifact.revision}</code>}</li>
+        ))}
+      </ul>
+    </section>
+
+    <section>
+      <h2>Evidence edges</h2>
+      <ol class="edges">
+        {item.edges.map((edge) => (
+          <li>
+            <div><strong>{edge.relation}</strong>: {edge.from} → {edge.to} <mark class={edge.status}>{edge.status}</mark></div>
+            {edge.citations.length > 0 && (
+              <small>Sources: {edge.citations.map((id, index) => {
+                const artifact = artifactById.get(id);
+                return <><a href={artifact?.url}>{artifact?.title ?? id}</a>{index < edge.citations.length - 1 ? ", " : ""}</>;
+              })}</small>
+            )}
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section><h2>Missing edges</h2><ul>{item.missing_edges.map((gap) => <li>{gap}</li>)}</ul></section>
+
+    <section>
+      <h2>Validation packets</h2>
+      <div class="packet-grid">
+        <a href={`/cases/${item.id}/control.md`}><strong>Control</strong><span>Raw-source review task</span></a>
+        <a href={`/cases/${item.id}/curated.md`}><strong>Curated</strong><span>Joined case view</span></a>
+        <a href={`/cases/${item.id}/questions.md`}><strong>Questions</strong><span>Fixed decision prompts</span></a>
+        <a href={`/cases/${item.id}/answer-key.md`}><strong>Answer key</strong><span>Boundary and expected decision</span></a>
+      </div>
+    </section>
+  </main>
+</Layout>
