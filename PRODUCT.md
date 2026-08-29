@@ -52,9 +52,117 @@ Every Binder claim must carry:
 | Kill condition | A failed check or changed root that removes the claim's current entitlement |
 | Receipt | The versioned, content-addressed observation produced by running the check |
 | Replay | Instructions and inputs sufficient for a receiver to rerun the observation |
-| Status | `WARRANTED`, `FAILED`, `STALE`, or `UNSUPPORTED`, always scoped to the claim and roots |
+| Entitlement | Whether the claim-specific observation stood, broke, or produced no verdict |
+| Freshness | Whether the receipt addresses the exact current subject and roots |
+| Policy | Whether the available current evidence crosses the action threshold for this context |
 
-`WARRANTED` means the required candidate checks passed, the expected base checks failed, and the recorded roots remain current. It never means whole-program safety or final truth.
+`WARRANTED` is a policy decision: the required current evidence crosses the configured threshold for action. It is not a truth value, whole-program safety, or final truth.
+
+## Epistemic model
+
+Binder separates three questions that ordinary CI collapses:
+
+```text
+Did the check execute?       execution
+What did it observe?         entitlement
+May we act on that evidence? policy
+```
+
+### Execution outcome
+
+The runner records whether the check machinery completed:
+
+```text
+completed | error | timeout
+```
+
+A compiler failure, missing tool, malformed fixture, or timeout is an execution problem. None is a refutation of the semantic claim.
+
+### Epistemic observation
+
+A completed claim-specific oracle returns:
+
+```text
+stood | refuted | no-verdict
+```
+
+- **Stood:** the claim survived a check that could have refuted it.
+- **Refuted:** the check ran and produced the declared counter-observation.
+- **No verdict:** no claim-specific observation was reached or the check cannot settle the claim.
+
+`stood` and `refuted` are sibling verdicts. `no-verdict` is the untested or untestable state. A process exit code cannot supply this classification by itself.
+
+Every `stood` or `refuted` observation must carry a typed witness. For example:
+
+```json
+{
+  "observation": "refuted",
+  "witness": {
+    "vault_before": 100,
+    "vault_after": 90,
+    "recipient_before": 5,
+    "recipient_after": 15
+  }
+}
+```
+
+### Freshness and claim instances
+
+Freshness is not another truth value. A receipt addresses one claim instance: statement plus exact subject and roots. If a rooted input changes, the old observation remains historical evidence about the old instance; the new instance has no current verdict.
+
+```text
+claim at commit A  stood
+claim at commit B  no current verdict; relevant root changed
+```
+
+Binder must never rewrite an old verdict as false or erase the subject for which it stood.
+
+### Policy warrant
+
+A policy evaluates current observations against a stakes-dependent action threshold:
+
+```text
+warranted | not-warranted
+```
+
+The same evidence may warrant a low-stakes merge and fail to warrant a mainnet deployment. Policy records which evidence kinds are required; it does not transform observations into stronger epistemic types.
+
+### Evidence types
+
+Formal and empirical evidence stay distinct:
+
+| Evidence kind | Entitlement supplied | Example rendering |
+| --- | --- | --- |
+| Formal | Closed relative to declared axioms and specifications | `PROVED transition kernel relative to spec` |
+| Empirical | Survived a bounded world-facing trial | `OBSERVED compiled program under fixture/runtime` |
+
+A policy may require both, but Binder must not render either as an undifferentiated `PASS` or imply that formal consistency establishes runtime behavior.
+
+### Target receipt model
+
+```text
+ClaimInstance
+  statement
+  subject: base revision, candidate revision, artifacts
+  roots
+  evidence kind
+  check
+  claim-specific oracle
+  kill conditions
+
+CheckResult
+  execution outcome
+  epistemic observation
+  typed witness
+  receipt identity
+
+PolicyEvaluation
+  required evidence kinds
+  action context
+  warranted decision
+```
+
+The current demo uses process success as its observation boundary and exposes `WARRANTED`, `FAILED`, `STALE`, and `UNSUPPORTED` as combined statuses. That is acceptable demonstration scaffolding, not the target production contract. Production work must introduce the separation above before freezing another receipt schema.
 
 ## Why this is more than CI
 
@@ -106,7 +214,7 @@ The CLI is Binder's product interface. Agents already know how to invoke command
 Agent-friendly means:
 
 - **Non-interactive:** every operation completes without prompts; consequential choices are explicit arguments or files.
-- **Structured:** `--format json` covers successful, non-warranted, and operational-error results with a versioned schema.
+- **Structured:** `--format json` covers execution outcome, epistemic observation, freshness, policy decision, and operational errors with a versioned schema.
 - **Stream-safe:** stdout contains only the requested result; diagnostics and trial output go to stderr.
 - **Stable:** documented exit codes and field meanings do not depend on terminal wording.
 - **Deterministic:** identical rooted inputs produce identical receipt identity and machine output, excluding explicitly separated run metadata.
@@ -205,6 +313,9 @@ Program metadata and explorers are later discovery interfaces. They should consu
 - A versioned machine claim compiled from an issue, pull request, audit finding, or small explicit manifest.
 - Real repository base and candidate revision identity.
 - Explicit expected outcomes and claim-specific observations.
+- Typed execution, observation, freshness, and policy fields; no semantic verdict inferred from a process exit code alone.
+- Typed witnesses for every stood or refuted observation.
+- Evidence kinds that preserve the formal/empirical boundary.
 - Existing project commands executed locally or in the repository owner's CI.
 - Versioned, deterministic, content-addressed receipts.
 - Declared source, toolchain, fixture, environment, and artifact roots.
@@ -279,6 +390,7 @@ This framing should acknowledge the assurance-case lineage rather than claim the
 - As a receiving agent, I want the claim, roots, command, and oracle in a machine-readable record so that I can inherit work without trusting the producing agent's summary.
 - As an agent, I want a non-interactive inspection command and stable JSON errors so that I can plan, execute, and recover without parsing human terminal text.
 - As a release owner, I want prior evidence to become stale when relevant inputs change so that old approval does not silently cover new code.
+- As a release owner, I want the policy threshold separated from the evidence verdict so that a mainnet deployment can require more than an ordinary merge.
 - As an auditor performing fix review, I want to see which claim and revision each check addresses so that I can focus renewed review on the affected assurance boundary.
 - As a skeptical reviewer, I want a one-command replay so that I can challenge the result without Binder's service or the original author.
 
@@ -320,10 +432,11 @@ Those descriptions either broaden the guarantee beyond the evidence or lead with
 
 1. Will maintainers author and maintain claims, or must claims be generated from existing tests and issue context?
 2. Is base/candidate contrast sufficient, or must v1 also compare against a developer gold fix to detect candidate-specific checks?
-3. What observation contract proves that a base failure represents the claimed defect rather than an unrelated command error?
+3. What is the smallest typed witness contract that works across existing test frameworks without creating a Binder testing DSL?
 4. Which roots can be discovered automatically without hiding consequential assumptions?
 5. How often will receivers actually replay, and is credible replayability valuable even when they do not?
 6. Is the first durable workflow audit remediation, agent-authored regression repair, or both?
 7. Should the machine claim be committed, generated from PR metadata, or both?
+8. Which action contexts and evidence thresholds should v1 support beyond merge review?
 
 These are validation questions. Product work should answer them with real review behavior before adding hosted infrastructure.

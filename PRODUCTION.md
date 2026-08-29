@@ -52,7 +52,7 @@ The CLI and receipt remain authoritative and independently replayable. The hoste
 - `binder verify` supports machine-readable JSON as well as the terminal report.
 - An official GitHub Action installs Binder, runs verification, uploads the replay bundle, reports a status check, and writes the job summary.
 - Released binaries and pinned Action versions remove the need to compile Binder in every repository.
-- Clear `WARRANTED`, `FAILED`, `STALE`, and `UNSUPPORTED` exit behavior is documented for release gates.
+- Clear execution, observation, freshness, and policy fields map to documented exit behavior for release gates.
 
 ### Program identity
 
@@ -144,11 +144,12 @@ The primary metric is **program upgrades reviewed with current Binder claims**, 
 
 ## Immediate implementation sequence
 
-1. ~~Freeze and document receipt schema v1, CLI exit codes, and JSON output contract.~~
-2. Define the PR claim convention, real Git base/candidate identity, and test-only-patch behavior in validation fixtures.
-3. Run the paired review study using the existing CLI and manually prepared claims.
-4. If authoring cost is the demonstrated constraint, add failing acceptance tests for `binder init` or PR-to-claim compilation.
-5. Only after the study passes, release cross-platform binaries and build the GitHub Action.
-6. Onboard the first real repository before starting the registry.
+1. Replace the demo's combined status model with typed execution, observation, freshness, and policy contracts; version the replacement receipt schema.
+2. Define the smallest claim-specific witness protocol that existing test runners can emit without adopting a Binder DSL.
+3. Define the PR claim convention, real Git base/candidate identity, and test-only-patch behavior in validation fixtures.
+4. Run the paired review study using manually prepared claims and the typed report.
+5. If authoring cost is the demonstrated constraint, add failing acceptance tests for `binder init` or PR-to-claim compilation.
+6. Only after the study passes, release cross-platform binaries and build the GitHub Action.
+7. Onboard the first real repository before starting the registry.
 
 This sequence keeps the next milestone falsifiable: if the claim–evidence relationship does not improve decisions inside the existing pull-request workflow, a new interface or hosted registry will not rescue the product.
