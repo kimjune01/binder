@@ -7,7 +7,7 @@ use std::process::Command;
 
 use binder_core::{
     Evidence, EvidenceVerdict, ReceiptBundle, WarrantStatus, changed_artifacts, evaluate,
-    load_claim, render_report,
+    load_claim, render_report, validate_receipt,
 };
 
 fn main() {
@@ -138,8 +138,19 @@ fn status(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
     })?;
     let bundle: ReceiptBundle = serde_yaml::from_slice(&bytes)
         .map_err(|error| format!("parse {}: {error}", receipt_path.display()))?;
-    if bundle.claim_id != loaded.claim.id {
-        return Err("receipt claim id does not match requested claim".into());
+    validate_receipt(&loaded.claim, &bundle)?;
+    let canonical_path = root
+        .join(".binder/receipts")
+        .join(&bundle.dependencies.identity)
+        .join("receipt.yaml");
+    let canonical = fs::read(&canonical_path).map_err(|error| {
+        format!(
+            "receipt has no content-addressed bundle ({}): {error}",
+            canonical_path.display()
+        )
+    })?;
+    if bytes != canonical {
+        return Err("latest receipt does not match its content-addressed bundle".into());
     }
     let mut warrant = evaluate(&loaded.claim, &loaded.snapshot, &bundle.base, &bundle.head);
     let artifacts = bundle

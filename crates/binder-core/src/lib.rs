@@ -129,6 +129,70 @@ pub struct Warrant {
     pub missing_trials: Vec<String>,
 }
 
+pub fn validate_receipt(claim: &Claim, bundle: &ReceiptBundle) -> Result<(), String> {
+    if bundle.claim_id != claim.id {
+        return Err("receipt claim id does not match requested claim".into());
+    }
+    validate_evidence_set(claim, &bundle.dependencies, &bundle.base, "base")?;
+    validate_evidence_set(claim, &bundle.dependencies, &bundle.head, "head")?;
+
+    let evaluated = evaluate(claim, &bundle.dependencies, &bundle.base, &bundle.head);
+    if evaluated.status != bundle.status {
+        return Err("receipt status does not match its evidence".into());
+    }
+    Ok(())
+}
+
+fn validate_evidence_set(
+    claim: &Claim,
+    dependencies: &DependencySnapshot,
+    evidence: &[Evidence],
+    revision: &str,
+) -> Result<(), String> {
+    let mut seen = BTreeSet::new();
+    for item in evidence {
+        if !seen.insert(item.trial_id.as_str()) {
+            return Err(format!("duplicate {revision} trial: {}", item.trial_id));
+        }
+        if item.dependencies != *dependencies {
+            return Err(format!(
+                "{} {revision} evidence has a mismatched dependency snapshot",
+                item.trial_id
+            ));
+        }
+        if item.command.is_empty() || item.command.iter().any(String::is_empty) {
+            return Err(format!("{} {revision} evidence has no command", item.trial_id));
+        }
+        if !is_sha256(&item.stdout_sha256) || !is_sha256(&item.stderr_sha256) {
+            return Err(format!(
+                "{} {revision} evidence has a malformed output digest",
+                item.trial_id
+            ));
+        }
+        if item.artifacts.values().any(|digest| !is_sha256(digest)) {
+            return Err(format!(
+                "{} {revision} evidence has a malformed artifact digest",
+                item.trial_id
+            ));
+        }
+    }
+    let expected = claim
+        .required_trials
+        .iter()
+        .map(String::as_str)
+        .collect::<BTreeSet<_>>();
+    if seen != expected {
+        return Err(format!(
+            "receipt {revision} trials do not exactly match the claim"
+        ));
+    }
+    Ok(())
+}
+
+fn is_sha256(value: &str) -> bool {
+    value.len() == 64 && value.bytes().all(|byte| byte.is_ascii_hexdigit())
+}
+
 pub fn load_claim(root: &Path, path: &Path) -> Result<LoadedClaim, String> {
     let bytes = fs::read(path).map_err(|error| format!("read {}: {error}", path.display()))?;
     let parsed: ClaimFile = serde_yaml::from_slice(&bytes)
