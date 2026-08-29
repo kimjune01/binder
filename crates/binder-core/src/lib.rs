@@ -15,6 +15,23 @@ pub struct Claim {
     pub required_trials: Vec<String>,
 }
 
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct LoadedClaim {
+    pub claim: Claim,
+    pub dependency_paths: Vec<String>,
+    pub snapshot: DependencySnapshot,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ClaimFile {
+    version: u32,
+    id: String,
+    claim: String,
+    dependencies: Vec<String>,
+    required_trials: Vec<String>,
+}
+
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct DependencySnapshot {
     pub identity: String,
@@ -63,6 +80,37 @@ pub struct Warrant {
     pub status: WarrantStatus,
     pub changed_dependencies: Vec<String>,
     pub missing_trials: Vec<String>,
+}
+
+pub fn load_claim(root: &Path, path: &Path) -> Result<LoadedClaim, String> {
+    let bytes = fs::read(path).map_err(|error| format!("read {}: {error}", path.display()))?;
+    let parsed: ClaimFile = serde_yaml::from_slice(&bytes)
+        .map_err(|error| format!("parse {}: {error}", path.display()))?;
+    if parsed.version != 1 {
+        return Err(format!("unsupported claim version: {}", parsed.version));
+    }
+    if parsed.id.trim().is_empty() || parsed.claim.trim().is_empty() {
+        return Err("claim id and statement must not be empty".into());
+    }
+    if parsed.required_trials.is_empty() {
+        return Err("claim must require at least one trial".into());
+    }
+    let path_refs = parsed
+        .dependencies
+        .iter()
+        .map(String::as_str)
+        .collect::<Vec<_>>();
+    let snapshot = snapshot_dependencies(root, &path_refs)
+        .map_err(|error| format!("snapshot claim dependencies: {error}"))?;
+
+    Ok(LoadedClaim {
+        claim: Claim {
+            id: parsed.id,
+            required_trials: parsed.required_trials,
+        },
+        dependency_paths: parsed.dependencies,
+        snapshot,
+    })
 }
 
 pub fn snapshot_dependencies(root: &Path, paths: &[&str]) -> io::Result<DependencySnapshot> {
@@ -148,6 +196,53 @@ pub fn evaluate(
         },
         changed_dependencies: Vec::new(),
         missing_trials: Vec::new(),
+    }
+}
+
+pub fn render_report(claim: &Claim, warrant: &Warrant, evidence: &[Evidence]) -> String {
+    let mut report = format!("{}  {}\n", status_label(warrant.status), claim.id);
+    if !warrant.changed_dependencies.is_empty() {
+        report.push_str("\nChanged\n");
+        for path in &warrant.changed_dependencies {
+            writeln!(&mut report, "  {path}").expect("writing to a string cannot fail");
+        }
+    }
+    if !warrant.missing_trials.is_empty() {
+        report.push_str("\nRequired\n");
+        for trial in &warrant.missing_trials {
+            writeln!(&mut report, "  MISSING  {trial}").expect("writing to a string cannot fail");
+        }
+    }
+    if !evidence.is_empty() {
+        report.push_str("\nEvidence\n");
+        for item in evidence {
+            writeln!(
+                &mut report,
+                "  {:<6}{}  inputs {}",
+                verdict_label(item.verdict),
+                item.trial_id,
+                &item.dependencies.identity[..12]
+            )
+            .expect("writing to a string cannot fail");
+        }
+    }
+    report
+}
+
+fn status_label(status: WarrantStatus) -> &'static str {
+    match status {
+        WarrantStatus::Warranted => "WARRANTED",
+        WarrantStatus::Failed => "FAILED",
+        WarrantStatus::Stale => "STALE",
+        WarrantStatus::Unsupported => "UNSUPPORTED",
+    }
+}
+
+fn verdict_label(verdict: EvidenceVerdict) -> &'static str {
+    match verdict {
+        EvidenceVerdict::Pass => "PASS",
+        EvidenceVerdict::Fail => "FAIL",
+        EvidenceVerdict::ExpectedFail => "XFAIL",
     }
 }
 
