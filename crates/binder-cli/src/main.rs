@@ -164,7 +164,7 @@ fn package_replay_bundle(
     }
     fs::write(
         receipt_dir.join("REPLAY.md"),
-        "# Binder replay bundle\n\nThe `inputs/` tree contains every declared input. Raw captured trial streams are in `outputs/`; their SHA-256 digests are recorded in `receipt.yaml`. External crates are pinned by `inputs/Cargo.lock` when present. From the original checkout, run `bash scripts/replay.sh`.\n",
+        "# Binder replay bundle\n\nThe `inputs/` tree contains every declared input. Raw captured trial streams are in `outputs/`; their SHA-256 digests are recorded in `receipt.yaml`. External crates are pinned by `inputs/Cargo.lock`; `cargo-build-sbf` is pinned by `inputs/scripts/replay.sh`. To reconstruct and verify from this bundle, run:\n\n```sh\ncd inputs\nbash scripts/replay.sh\n```\n",
     )
     .map_err(|error| format!("write replay instructions: {error}"))?;
     Ok(())

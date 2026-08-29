@@ -38,5 +38,7 @@ fn verify_packages_inputs_and_raw_trial_outputs() {
     assert!(bundle.join("outputs/base-0.stderr").is_file());
     assert!(bundle.join("outputs/head-0.stdout").is_file());
     assert!(bundle.join("outputs/head-0.stderr").is_file());
-    assert!(bundle.join("REPLAY.md").is_file());
+    let replay = fs::read_to_string(bundle.join("REPLAY.md")).unwrap();
+    assert!(replay.contains("cd inputs"));
+    assert!(replay.contains("bash scripts/replay.sh"));
 }
