@@ -8,7 +8,8 @@ use std::process::Command;
 
 use binder_core::{
     BINDER_VERSION, Evidence, EvidenceVerdict, RECEIPT_SCHEMA_VERSION, ReceiptBundle,
-    WarrantStatus, changed_artifacts, evaluate, load_claim, render_report, validate_receipt,
+    WarrantStatus, changed_artifacts, evaluate, load_claim, receipt_identity, render_report,
+    validate_receipt,
 };
 
 fn main() {
@@ -90,9 +91,8 @@ fn verify(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
         head: head.clone(),
         status: warrant.status,
     };
-    let receipt_dir = root
-        .join(".binder/receipts")
-        .join(&loaded.snapshot.identity);
+    let receipt_digest = receipt_identity(&bundle)?;
+    let receipt_dir = root.join(".binder/receipts").join(&receipt_digest);
     fs::create_dir_all(&receipt_dir)
         .map_err(|error| format!("create {}: {error}", receipt_dir.display()))?;
     let receipt = serde_yaml::to_string(&bundle)
@@ -103,10 +103,11 @@ fn verify(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
     let claim_dir = root.join(".binder/claims");
     fs::create_dir_all(&claim_dir)
         .map_err(|error| format!("create {}: {error}", claim_dir.display()))?;
-    let latest = serde_yaml::to_string(&bundle)
-        .map_err(|error| format!("serialize latest receipt: {error}"))?;
-    fs::write(claim_dir.join(format!("{}.yaml", loaded.claim.id)), latest)
-        .map_err(|error| format!("write latest claim receipt: {error}"))?;
+    fs::write(
+        claim_dir.join(&loaded.claim.id),
+        format!("{receipt_digest}\n"),
+    )
+    .map_err(|error| format!("write latest claim receipt pointer: {error}"))?;
 
     let mut report = render_report(&loaded.claim, &warrant, &head);
     report.insert_str(
@@ -175,31 +176,33 @@ fn package_replay_bundle(
 }
 
 fn status(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
-    let receipt_path = root
-        .join(".binder/claims")
-        .join(format!("{}.yaml", loaded.claim.id));
-    let bytes = fs::read(&receipt_path).map_err(|error| {
+    let receipt_path = root.join(".binder/claims").join(&loaded.claim.id);
+    let pointer = fs::read_to_string(&receipt_path).map_err(|error| {
         format!(
             "no recorded warrant for {} ({}): {error}",
             loaded.claim.id,
             receipt_path.display()
         )
     })?;
-    let bundle: ReceiptBundle = serde_yaml::from_slice(&bytes)
-        .map_err(|error| format!("parse {}: {error}", receipt_path.display()))?;
-    validate_receipt(&loaded.claim, &bundle)?;
+    let receipt_digest = pointer.trim();
+    if receipt_digest.len() != 64 || !receipt_digest.bytes().all(|byte| byte.is_ascii_hexdigit()) {
+        return Err("legacy or malformed receipt pointer; rerun binder verify".into());
+    }
     let canonical_path = root
         .join(".binder/receipts")
-        .join(&bundle.dependencies.identity)
+        .join(receipt_digest)
         .join("receipt.yaml");
-    let canonical = fs::read(&canonical_path).map_err(|error| {
+    let bytes = fs::read(&canonical_path).map_err(|error| {
         format!(
-            "receipt has no content-addressed bundle ({}): {error}",
+            "receipt pointer has no content-addressed bundle ({}): {error}",
             canonical_path.display()
         )
     })?;
-    if bytes != canonical {
-        return Err("latest receipt does not match its content-addressed bundle".into());
+    let bundle: ReceiptBundle = serde_yaml::from_slice(&bytes)
+        .map_err(|error| format!("parse {}: {error}", canonical_path.display()))?;
+    validate_receipt(&loaded.claim, &bundle)?;
+    if receipt_identity(&bundle)? != receipt_digest {
+        return Err("receipt contents do not match their content address".into());
     }
     let mut warrant = evaluate(&loaded.claim, &loaded.snapshot, &bundle.base, &bundle.head);
     let artifacts = bundle

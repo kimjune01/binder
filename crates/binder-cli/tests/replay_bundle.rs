@@ -1,6 +1,8 @@
 use std::fs;
 use std::process::Command;
 
+use binder_core::{ReceiptBundle, receipt_identity};
+
 #[test]
 fn verify_packages_inputs_and_raw_trial_outputs() {
     let dir = tempfile::tempdir().unwrap();
@@ -32,6 +34,14 @@ fn verify_packages_inputs_and_raw_trial_outputs() {
         .unwrap()
         .unwrap()
         .path();
+    let receipt: ReceiptBundle =
+        serde_yaml::from_slice(&fs::read(bundle.join("receipt.yaml")).unwrap()).unwrap();
+    let digest = receipt_identity(&receipt).unwrap();
+    assert_eq!(bundle.file_name().unwrap(), digest.as_str());
+    assert_eq!(
+        fs::read_to_string(dir.path().join(".binder/claims/portable-demo")).unwrap(),
+        format!("{digest}\n")
+    );
     assert_eq!(
         fs::read_to_string(bundle.join("inputs/input.txt")).unwrap(),
         "declared input"

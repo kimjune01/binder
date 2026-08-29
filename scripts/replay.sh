@@ -32,9 +32,9 @@ fi
 bash scripts/mollusk-trial.sh fixed
 cargo test --workspace --locked
 cargo run --quiet --locked -p binder-cli -- verify "$claim"
-first_receipt="$(sha256_file .binder/claims/failed-withdrawal-preserves-balances.yaml)"
+first_receipt="$(sha256_file .binder/claims/failed-withdrawal-preserves-balances)"
 cargo run --quiet --locked -p binder-cli -- verify "$claim"
-second_receipt="$(sha256_file .binder/claims/failed-withdrawal-preserves-balances.yaml)"
+second_receipt="$(sha256_file .binder/claims/failed-withdrawal-preserves-balances)"
 test "$first_receipt" = "$second_receipt"
 cargo run --quiet --locked -p binder-cli -- status "$claim"
 echo "Replay complete: deterministic receipt $second_receipt"
