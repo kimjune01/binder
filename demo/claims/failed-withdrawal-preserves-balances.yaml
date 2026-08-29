@@ -1,0 +1,13 @@
+version: 1
+id: failed-withdrawal-preserves-balances
+claim: An unsuccessful withdrawal cannot reduce the vault balance or increase the recipient balance.
+dependencies:
+  - crates/vault-transition/src/lib.rs
+  - demo/specs/withdrawal.md
+  - demo/fixtures/unauthorized-withdrawal.txt
+  - rust-toolchain.toml
+  - Cargo.lock
+required_trials:
+  - rust-transition-proof
+  - runtime-replay
+
