@@ -25,9 +25,9 @@
   ],
   "missing_edges": ["A machine-verifiable link from the audited release to each live redeployment.", "A single claim covering the additional duplicate-index and downstream composition risks would require separate evidence."],
   "packets": {
-    "control":"hub/packets/hyperbridge-out-of-bounds/control.md",
-    "curated":"hub/packets/hyperbridge-out-of-bounds/curated.md",
-    "questions":"hub/packets/hyperbridge-out-of-bounds/questions.md",
-    "answer_key":"hub/packets/hyperbridge-out-of-bounds/answer-key.md"
+    "control":"hub/src/content/packets/hyperbridge-out-of-bounds/control.md",
+    "curated":"hub/src/content/packets/hyperbridge-out-of-bounds/curated.md",
+    "questions":"hub/src/content/packets/hyperbridge-out-of-bounds/questions.md",
+    "answer_key":"hub/src/content/packets/hyperbridge-out-of-bounds/answer-key.md"
   }
 }

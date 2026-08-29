@@ -24,9 +24,9 @@
   ],
   "missing_edges": ["A defined restricted re-audit scope for the materially changed contracts.", "Evidence that production role configuration and deployed bytecode match the reviewed system."],
   "packets": {
-    "control":"hub/packets/endaoment-remediation-refactor/control.md",
-    "curated":"hub/packets/endaoment-remediation-refactor/curated.md",
-    "questions":"hub/packets/endaoment-remediation-refactor/questions.md",
-    "answer_key":"hub/packets/endaoment-remediation-refactor/answer-key.md"
+    "control":"hub/src/content/packets/endaoment-remediation-refactor/control.md",
+    "curated":"hub/src/content/packets/endaoment-remediation-refactor/curated.md",
+    "questions":"hub/src/content/packets/endaoment-remediation-refactor/questions.md",
+    "answer_key":"hub/src/content/packets/endaoment-remediation-refactor/answer-key.md"
   }
 }
