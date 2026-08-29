@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 pub const RECEIPT_SCHEMA_VERSION: u32 = 1;
+pub const TYPED_RECEIPT_SCHEMA_VERSION: u32 = 2;
 pub const BINDER_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -21,6 +22,7 @@ pub struct Claim {
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct LoadedClaim {
+    pub version: u32,
     pub claim: Claim,
     pub dependency_paths: Vec<String>,
     pub snapshot: DependencySnapshot,
@@ -34,6 +36,93 @@ pub struct Trial {
     pub command: Vec<String>,
     #[serde(default)]
     pub artifacts: Vec<String>,
+    #[serde(default)]
+    pub evidence_kind: Option<EvidenceKind>,
+    #[serde(default)]
+    #[serde(alias = "test_paths")]
+    pub overlay_from_head: Vec<String>,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum EvidenceKind {
+    Formal,
+    Empirical,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ExecutionOutcome {
+    Completed,
+    Error,
+    Timeout,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum Observation {
+    Stood,
+    Refuted,
+    NoVerdict,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum Freshness {
+    Current,
+    Stale,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum PolicyDecision {
+    Warranted,
+    NotWarranted,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct TypedOutcome {
+    pub execution: ExecutionOutcome,
+    pub observation: Observation,
+    pub witness: serde_json::Value,
+    pub stdout_sha256: String,
+    pub stderr_sha256: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct TypedTrialReceipt {
+    pub id: String,
+    pub evidence_kind: EvidenceKind,
+    pub base: TypedOutcome,
+    pub head: TypedOutcome,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+pub struct Subject {
+    pub base: String,
+    pub head: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct TypedReceipt {
+    pub schema_version: u32,
+    pub binder_version: String,
+    pub claim_id: String,
+    pub statement: String,
+    pub subject: Subject,
+    pub trials: Vec<TypedTrialReceipt>,
+    pub freshness: Freshness,
+    pub policy: PolicyDecision,
+}
+
+pub fn typed_receipt_identity(receipt: &TypedReceipt) -> Result<String, String> {
+    serde_json::to_vec(receipt)
+        .map(|bytes| hex_digest(&bytes))
+        .map_err(|error| format!("serialize typed receipt: {error}"))
+}
+
+pub fn digest_bytes(bytes: &[u8]) -> String {
+    hex_digest(bytes)
 }
 
 #[derive(Deserialize)]
@@ -228,7 +317,7 @@ pub fn load_claim(root: &Path, path: &Path) -> Result<LoadedClaim, String> {
     let bytes = fs::read(path).map_err(|error| format!("read {}: {error}", path.display()))?;
     let parsed: ClaimFile = serde_yaml::from_slice(&bytes)
         .map_err(|error| format!("parse {}: {error}", path.display()))?;
-    if parsed.version != 1 {
+    if !matches!(parsed.version, 1 | 2) {
         return Err(format!("unsupported claim version: {}", parsed.version));
     }
     if parsed.id.trim().is_empty() || parsed.claim.trim().is_empty() {
@@ -249,6 +338,13 @@ pub fn load_claim(root: &Path, path: &Path) -> Result<LoadedClaim, String> {
         .iter()
         .map(|trial| trial.id.as_str())
         .collect::<BTreeSet<_>>();
+    if defined_trials.len() != parsed.trials.len() {
+        return Err("trial ids must be unique".into());
+    }
+    if parsed.required_trials.iter().collect::<BTreeSet<_>>().len() != parsed.required_trials.len()
+    {
+        return Err("required trial ids must be unique".into());
+    }
     for required in &parsed.required_trials {
         if !defined_trials.contains(required.as_str()) {
             return Err(format!("required trial has no definition: {required}"));
@@ -270,6 +366,7 @@ pub fn load_claim(root: &Path, path: &Path) -> Result<LoadedClaim, String> {
         .map_err(|error| format!("snapshot claim dependencies: {error}"))?;
 
     Ok(LoadedClaim {
+        version: parsed.version,
         claim: Claim {
             id: parsed.id,
             statement: parsed.claim,

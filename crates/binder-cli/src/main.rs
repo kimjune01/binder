@@ -7,9 +7,10 @@ use std::path::Path;
 use std::process::Command;
 
 use binder_core::{
-    BINDER_VERSION, Evidence, EvidenceVerdict, RECEIPT_SCHEMA_VERSION, ReceiptBundle,
-    WarrantStatus, changed_artifacts, evaluate, load_claim, receipt_identity, render_report,
-    validate_receipt,
+    BINDER_VERSION, Evidence, EvidenceVerdict, ExecutionOutcome, Freshness, Observation,
+    PolicyDecision, RECEIPT_SCHEMA_VERSION, ReceiptBundle, Subject, TYPED_RECEIPT_SCHEMA_VERSION,
+    TypedOutcome, TypedReceipt, TypedTrialReceipt, WarrantStatus, changed_artifacts, evaluate,
+    load_claim, receipt_identity, render_report, typed_receipt_identity, validate_receipt,
 };
 
 fn main() {
@@ -21,19 +22,47 @@ fn main() {
 
 fn run() -> Result<(), String> {
     let args = env::args().skip(1).collect::<Vec<_>>();
-    let (command, claim_path, format) = match args.as_slice() {
-        [command, claim_path] => (command, claim_path, OutputFormat::Text),
+    let (command, claim_path, format, revisions) = match args.as_slice() {
+        [command, claim_path] => (command, claim_path, OutputFormat::Text, None),
         [command, claim_path, flag, value] if flag == "--format" && value == "json" => {
-            (command, claim_path, OutputFormat::Json)
+            (command, claim_path, OutputFormat::Json, None)
+        }
+        [
+            command,
+            claim_path,
+            base_flag,
+            base,
+            head_flag,
+            head,
+            format_flag,
+            format,
+        ] if base_flag == "--base"
+            && head_flag == "--head"
+            && format_flag == "--format"
+            && format == "json" =>
+        {
+            (
+                command,
+                claim_path,
+                OutputFormat::Json,
+                Some((base.as_str(), head.as_str())),
+            )
         }
         _ => {
-            return Err("usage: binder-cli <verify|status> <claim.yaml> [--format json]".into());
+            return Err(
+                "usage: binder-cli verify <claim.yaml> [--base REV --head REV] [--format json]"
+                    .into(),
+            );
         }
     };
 
     let root = env::current_dir().map_err(|error| format!("find workspace root: {error}"))?;
     let loaded = load_claim(&root, Path::new(claim_path))?;
     match command.as_str() {
+        "verify" if loaded.version == 2 => {
+            let (base, head) = revisions.ok_or("claim v2 requires --base and --head")?;
+            verify_typed(&root, loaded, base, head, format)
+        }
         "verify" => verify(&root, loaded, format),
         "status" => status(&root, loaded, format),
         _ => Err(format!("unknown command: {command}")),
@@ -44,6 +73,216 @@ fn run() -> Result<(), String> {
 enum OutputFormat {
     Text,
     Json,
+}
+
+fn verify_typed(
+    root: &Path,
+    loaded: binder_core::LoadedClaim,
+    base: &str,
+    head: &str,
+    format: OutputFormat,
+) -> Result<(), String> {
+    let temporary =
+        tempfile::tempdir().map_err(|error| format!("create worktree area: {error}"))?;
+    let base_root = temporary.path().join("base");
+    let head_root = temporary.path().join("head");
+    add_worktree(root, &base_root, base)?;
+    if let Err(error) = add_worktree(root, &head_root, head) {
+        remove_worktree(root, &base_root);
+        return Err(error);
+    }
+
+    let result: Result<bool, String> = (|| {
+        let mut trials = Vec::new();
+        for trial in &loaded.trials {
+            let evidence_kind = trial
+                .evidence_kind
+                .ok_or_else(|| format!("v2 trial {} requires evidence_kind", trial.id))?;
+            overlay_paths(&head_root, &base_root, &trial.overlay_from_head)?;
+            trials.push(TypedTrialReceipt {
+                id: trial.id.clone(),
+                evidence_kind,
+                base: execute_typed(&base_root, trial),
+                head: execute_typed(&head_root, trial),
+            });
+        }
+        let required = loaded
+            .claim
+            .required_trials
+            .iter()
+            .collect::<std::collections::BTreeSet<_>>();
+        let warranted = trials
+            .iter()
+            .filter(|trial| required.contains(&trial.id))
+            .all(|trial| {
+                trial.base.execution == ExecutionOutcome::Completed
+                    && trial.base.observation == Observation::Refuted
+                    && trial.head.execution == ExecutionOutcome::Completed
+                    && trial.head.observation == Observation::Stood
+            });
+        let receipt = TypedReceipt {
+            schema_version: TYPED_RECEIPT_SCHEMA_VERSION,
+            binder_version: BINDER_VERSION.into(),
+            claim_id: loaded.claim.id.clone(),
+            statement: loaded.claim.statement.clone(),
+            subject: Subject {
+                base: base.into(),
+                head: head.into(),
+            },
+            trials,
+            freshness: Freshness::Current,
+            policy: if warranted {
+                PolicyDecision::Warranted
+            } else {
+                PolicyDecision::NotWarranted
+            },
+        };
+        persist_typed_receipt(root, &receipt)?;
+        let digest = typed_receipt_identity(&receipt)?;
+        match format {
+            OutputFormat::Json => {
+                let mut value = serde_json::to_value(&receipt)
+                    .map_err(|error| format!("serialize typed receipt: {error}"))?;
+                value
+                    .as_object_mut()
+                    .unwrap()
+                    .insert("command".into(), "verify".into());
+                value
+                    .as_object_mut()
+                    .unwrap()
+                    .insert("receipt_digest".into(), digest.into());
+                println!("{}", serde_json::to_string(&value).unwrap());
+            }
+            OutputFormat::Text => println!(
+                "{}\nClaim  {}\nBase   {}\nHead   {}\nReceipt {}",
+                if warranted {
+                    "WARRANTED"
+                } else {
+                    "NOT WARRANTED"
+                },
+                loaded.claim.statement,
+                base,
+                head,
+                digest
+            ),
+        }
+        Ok(warranted)
+    })();
+    remove_worktree(root, &base_root);
+    remove_worktree(root, &head_root);
+    if !result? {
+        std::process::exit(1);
+    }
+    Ok(())
+}
+
+fn add_worktree(repo: &Path, path: &Path, revision: &str) -> Result<(), String> {
+    let output = Command::new("git")
+        .args(["worktree", "add", "--detach", "--quiet"])
+        .arg(path)
+        .arg(revision)
+        .current_dir(repo)
+        .output()
+        .map_err(|error| format!("start git worktree: {error}"))?;
+    if output.status.success() {
+        Ok(())
+    } else {
+        Err(format!(
+            "create worktree for {revision}: {}",
+            String::from_utf8_lossy(&output.stderr).trim()
+        ))
+    }
+}
+
+fn remove_worktree(repo: &Path, path: &Path) {
+    let _ = Command::new("git")
+        .args(["worktree", "remove", "--force"])
+        .arg(path)
+        .current_dir(repo)
+        .output();
+}
+
+fn overlay_paths(head: &Path, base: &Path, paths: &[String]) -> Result<(), String> {
+    for relative in paths {
+        let source = head.join(relative);
+        let destination = base.join(relative);
+        if let Some(parent) = destination.parent() {
+            fs::create_dir_all(parent)
+                .map_err(|error| format!("create overlay parent: {error}"))?;
+        }
+        fs::copy(&source, &destination)
+            .map_err(|error| format!("overlay {} from head: {error}", source.display()))?;
+    }
+    Ok(())
+}
+
+fn execute_typed(root: &Path, trial: &binder_core::Trial) -> TypedOutcome {
+    let Some((program, arguments)) = trial.command.split_first() else {
+        return typed_error(&[], b"empty command");
+    };
+    let output = match Command::new(program)
+        .args(arguments)
+        .current_dir(root)
+        .output()
+    {
+        Ok(output) => output,
+        Err(error) => return typed_error(&[], error.to_string().as_bytes()),
+    };
+    let (execution, observation, witness) = if output.status.success() {
+        let parsed = output
+            .stdout
+            .split(|byte| *byte == b'\n')
+            .rev()
+            .find(|line| !line.is_empty())
+            .and_then(|line| serde_json::from_slice::<serde_json::Value>(line).ok());
+        let observation = parsed
+            .as_ref()
+            .and_then(|value| value.get("observation"))
+            .and_then(|value| serde_json::from_value(value.clone()).ok())
+            .unwrap_or(Observation::NoVerdict);
+        let witness = parsed
+            .and_then(|value| value.get("witness").cloned())
+            .unwrap_or(serde_json::Value::Null);
+        (ExecutionOutcome::Completed, observation, witness)
+    } else {
+        (
+            ExecutionOutcome::Error,
+            Observation::NoVerdict,
+            serde_json::Value::Null,
+        )
+    };
+    TypedOutcome {
+        execution,
+        observation,
+        witness,
+        stdout_sha256: binder_core::digest_bytes(&output.stdout),
+        stderr_sha256: binder_core::digest_bytes(&output.stderr),
+    }
+}
+
+fn typed_error(stdout: &[u8], stderr: &[u8]) -> TypedOutcome {
+    TypedOutcome {
+        execution: ExecutionOutcome::Error,
+        observation: Observation::NoVerdict,
+        witness: serde_json::Value::Null,
+        stdout_sha256: binder_core::digest_bytes(stdout),
+        stderr_sha256: binder_core::digest_bytes(stderr),
+    }
+}
+
+fn persist_typed_receipt(root: &Path, receipt: &TypedReceipt) -> Result<(), String> {
+    let digest = typed_receipt_identity(receipt)?;
+    let directory = root.join(".binder/receipts").join(&digest);
+    fs::create_dir_all(&directory).map_err(|error| format!("create typed receipt: {error}"))?;
+    fs::write(
+        directory.join("receipt.json"),
+        serde_json::to_vec_pretty(receipt).unwrap(),
+    )
+    .map_err(|error| format!("write typed receipt: {error}"))?;
+    let claims = root.join(".binder/claims");
+    fs::create_dir_all(&claims).map_err(|error| format!("create claim pointers: {error}"))?;
+    fs::write(claims.join(&receipt.claim_id), format!("{digest}\n"))
+        .map_err(|error| format!("write claim pointer: {error}"))
 }
 
 fn verify(
