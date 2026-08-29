@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "hyperbridge-out-of-bounds",
+  "title": "The proof verified a leaf it never consumed",
+  "ecosystem": "Ethereum / Polkadot / Hyperbridge",
+  "class": "postmortem-remediation",
+  "summary": "An MMR verifier accepted a genuine leaf while silently leaving a forged out-of-bounds leaf unconsumed; downstream settlement treated both as verified.",
+  "claim": "The OutOfBoundsLeaves check and audited v1.0.0 release remediate the exploited out-of-bounds-leaf path in solidity-merkle-trees.",
+  "evidence_boundary": "The postmortem, fix, audit, and release support the named path. They do not imply that every verifier composition or downstream deployment is sound, and the incident itself triggered discovery of additional related flaws.",
+  "decision": {
+    "question": "Does the public chain justify treating the specific exploited path as remediated, and what must remain separate?",
+    "expected": "The named library path is strongly supported as remediated; deployment identity and broader verifier soundness remain separate claims."
+  },
+  "artifacts": [
+    {"id":"postmortem","kind":"postmortem","title":"Hyperbridge MMR verifier exploit postmortem","url":"https://blog.hyperbridge.network/april-13-post-mortem/"},
+    {"id":"fix-pr","kind":"pull request","title":"Add OutOfBoundsLeaves invariant","url":"https://github.com/polytope-labs/solidity-merkle-trees/pull/51"},
+    {"id":"release","kind":"source repository","title":"solidity-merkle-trees (v1.0.0 publication reported in postmortem)","url":"https://github.com/polytope-labs/solidity-merkle-trees"},
+    {"id":"audit-report","kind":"audit","title":"SRLabs independent review","url":"https://github.com/polytope-labs/hyperbridge/blob/main/audits/SRL-Hyperbridge-Solidity-audit-v1.2.pdf"}
+  ],
+  "edges": [
+    {"id":"exploit-root","relation":"caused by","from":"April 13 exploit","to":"unconsumed out-of-bounds leaf","status":"sourced","citations":["postmortem"]},
+    {"id":"fix-root","relation":"remediates","from":"OutOfBoundsLeaves invariant","to":"unconsumed-leaf path","status":"sourced","citations":["postmortem","fix-pr"]},
+    {"id":"release-audit","relation":"released after","from":"v1.0.0","to":"internal and SRLabs review","status":"sourced","citations":["postmortem","release","audit-report"]},
+    {"id":"deployment-match","relation":"deployed as","from":"audited v1.0.0 source/build","to":"current Hyperbridge verifier instances","status":"missing","citations":[]}
+  ],
+  "missing_edges": ["A machine-verifiable link from the audited release to each live redeployment.", "A single claim covering the additional duplicate-index and downstream composition risks would require separate evidence."],
+  "packets": {
+    "control":"hub/packets/hyperbridge-out-of-bounds/control.md",
+    "curated":"hub/packets/hyperbridge-out-of-bounds/curated.md",
+    "questions":"hub/packets/hyperbridge-out-of-bounds/questions.md",
+    "answer_key":"hub/packets/hyperbridge-out-of-bounds/answer-key.md"
+  }
+}

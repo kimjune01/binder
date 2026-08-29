@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "solana-stale-cancel",
+  "title": "An old cancellation approval reaches a new subscription",
+  "ecosystem": "Solana",
+  "class": "authorization-replay",
+  "summary": "A reusable PDA let a cancellation signed for one subscription incarnation act on a later subscription until the approval was bound to its period start.",
+  "claim": "A CancelSubscriptionNow approval carrying the prior subscription's current_period_start_ts is rejected after re-subscription at the same PDA.",
+  "evidence_boundary": "The public head-side regression concerns one replay scenario in LiteSVM. It does not establish whole-program safety, deployed identity, or the required base observation.",
+  "decision": {
+    "question": "Does the public evidence warrant the declared base-refuted/head-stood remediation claim?",
+    "expected": "Request evidence: the head is relevant, but the same observation against the audited base is not preserved."
+  },
+  "artifacts": [
+    {"id":"audit-status","kind":"audit","title":"Audit status and reviewed revisions","url":"https://github.com/solana-foundation/subscriptions/blob/main/audits/AUDIT_STATUS.md","revision":"d6b3a5dc…debb4f75"},
+    {"id":"audit-report","kind":"finding","title":"Cantina audit report, finding 3.2.1","url":"https://github.com/solana-foundation/subscriptions/blob/main/audits/report-cli-cantina-a1f6fc40-7817-446d-bb88-abd0f2b96106-2026-07-30-solana-foundation-subscriptions.pdf"},
+    {"id":"fix","kind":"commit","title":"Bind cancel_now to subscription incarnation","url":"https://github.com/solana-foundation/subscriptions/commit/d4b29e80e2b3db3fc5cd449ffb7b563055644d51","revision":"d4b29e80"}
+  ],
+  "edges": [
+    {"id":"finding-base","relation":"affects","from":"audit-report","to":"d6b3a5dc","status":"sourced","citations":["audit-status","audit-report"]},
+    {"id":"fix-finding","relation":"remediates","from":"fix","to":"audit finding 3.2.1","status":"sourced","citations":["fix","audit-report"]},
+    {"id":"head-observation","relation":"observed on head","from":"stale-approval regression","to":"d4b29e80","status":"sourced","citations":["fix"]},
+    {"id":"base-observation","relation":"observed on base","from":"same regression scenario","to":"d6b3a5dc","status":"missing","citations":[]}
+  ],
+  "missing_edges": ["A preserved base witness showing that the stale approval succeeds on the audited revision.", "A source/build/deployment identity linking the reviewed remediation to a live program."],
+  "packets": {
+    "control":"hub/packets/solana-stale-cancel/control.md",
+    "curated":"hub/packets/solana-stale-cancel/curated.md",
+    "questions":"hub/packets/solana-stale-cancel/questions.md",
+    "answer_key":"hub/packets/solana-stale-cancel/answer-key.md"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "endaoment-remediation-refactor",
+  "title": "When fixing the audit creates a new audit subject",
+  "ecosystem": "Ethereum",
+  "class": "upgrade-migration",
+  "summary": "Endaoment fixed major governance issues through a broad refactor; OpenZeppelin then warned that the resulting codebase may itself merit another restricted audit.",
+  "claim": "Resolution of the reported major findings is sufficient evidence that the materially refactored system is ready for production.",
+  "evidence_boundary": "The audit update records finding-level fixes, not comprehensive coverage of the substantially changed codebase, its configured roles, or a deployed instance.",
+  "decision": {
+    "question": "Should the original audit plus fix review be treated as coverage of the refactored production candidate?",
+    "expected": "Request a targeted re-audit and deployment/configuration evidence; the auditor explicitly says the fixes produced a substantially different codebase."
+  },
+  "artifacts": [
+    {"id":"audit","kind":"audit","title":"OpenZeppelin Endaoment audit and update","url":"https://www.openzeppelin.com/news/endaoment-audit","revision":"f60aa253"},
+    {"id":"fix-pr-76","kind":"pull request","title":"Governance remediation PR 76","url":"https://github.com/endaoment/endaoment-contracts/pull/76"},
+    {"id":"fix-pr-77","kind":"pull request","title":"Governance remediation PR 77","url":"https://github.com/endaoment/endaoment-contracts/pull/77"}
+  ],
+  "edges": [
+    {"id":"audit-scope","relation":"audits","from":"audit","to":"f60aa253 source scope","status":"sourced","citations":["audit"]},
+    {"id":"fixes-finding","relation":"fixes","from":"PRs 76 and 77","to":"governance restriction finding","status":"sourced","citations":["audit","fix-pr-76","fix-pr-77"]},
+    {"id":"fix-review","relation":"reviews","from":"audit update","to":"reported major fixes","status":"sourced","citations":["audit"]},
+    {"id":"coverage-refactor","relation":"covers comprehensively","from":"original engagement","to":"refactored codebase","status":"missing","citations":[]}
+  ],
+  "missing_edges": ["A defined restricted re-audit scope for the materially changed contracts.", "Evidence that production role configuration and deployed bytecode match the reviewed system."],
+  "packets": {
+    "control":"hub/packets/endaoment-remediation-refactor/control.md",
+    "curated":"hub/packets/endaoment-remediation-refactor/curated.md",
+    "questions":"hub/packets/endaoment-remediation-refactor/questions.md",
+    "answer_key":"hub/packets/endaoment-remediation-refactor/answer-key.md"
+  }
+}

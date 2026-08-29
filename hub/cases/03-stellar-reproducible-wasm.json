@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "id": "stellar-reproducible-wasm",
+  "title": "The Wasm reproduces—but who should trust the builder?",
+  "ecosystem": "Stellar / Soroban",
+  "class": "build-deployment-identity",
+  "summary": "A real contract Wasm was reproduced from source in a pinned container, prompting a long design debate over provenance, hostile images, public source, and verification badges.",
+  "claim": "Reproducing the deployed Wasm from the referenced source and build image establishes that the source faithfully describes the contract.",
+  "evidence_boundary": "A byte-for-byte rebuild establishes a source/environment/output relationship. It does not establish that the image or compiler is faithful, that the source is safe, or that a named trusted party produced the original artifact.",
+  "decision": {
+    "question": "Is a successful containerized rebuild enough to show a source-faithful and trustworthy deployment?",
+    "expected": "No. Accept the reproducibility edge but request a separate trust basis for the build image/provenance and keep behavioral safety out of scope."
+  },
+  "artifacts": [
+    {"id":"discussion","kind":"standards discussion","title":"Contract Source Verification using Docker without Attestation","url":"https://github.com/orgs/stellar/discussions/1923"},
+    {"id":"sep58","kind":"specification","title":"SEP-58 Contract Build Reproducibility","url":"https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0058.md"},
+    {"id":"prototype","kind":"implementation","title":"stellar-cli reproducible-build prototype","url":"https://github.com/stellar/stellar-cli/pull/2525"},
+    {"id":"wasm-result","kind":"observation","title":"Scheduled verification result for mainnet Wasm","url":"https://github.com/stellar-experimental/contract-verifications"}
+  ],
+  "edges": [
+    {"id":"source-build","relation":"reproduces","from":"referenced source + build metadata","to":"deployed Wasm hash e7089d…","status":"sourced","citations":["discussion","wasm-result"]},
+    {"id":"spec-prototype","relation":"implemented by","from":"SEP-58 draft mechanism","to":"stellar-cli prototype","status":"sourced","citations":["sep58","prototype"]},
+    {"id":"image-faithful","relation":"faithfully compiles","from":"selected build image","to":"referenced source semantics","status":"missing","citations":[]},
+    {"id":"safe-contract","relation":"establishes safety of","from":"successful rebuild","to":"contract behavior","status":"missing","citations":[]}
+  ],
+  "missing_edges": ["An independently justified trust policy for the compiler/build image.", "A behavioral claim and evidence about what the reproduced contract does."],
+  "packets": {
+    "control":"hub/packets/stellar-reproducible-wasm/control.md",
+    "curated":"hub/packets/stellar-reproducible-wasm/curated.md",
+    "questions":"hub/packets/stellar-reproducible-wasm/questions.md",
+    "answer_key":"hub/packets/stellar-reproducible-wasm/answer-key.md"
+  }
+}

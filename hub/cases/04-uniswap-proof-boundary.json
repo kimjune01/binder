@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "uniswap-proof-boundary",
+  "title": "A formal proof with an intentionally smaller world",
+  "ecosystem": "Ethereum / Uniswap V2",
+  "class": "invariant-scope",
+  "summary": "The Uniswap V2 audit proved bytecode-level single-call specifications while explicitly excluding the multi-call constant-product invariant and assuming particular token behavior.",
+  "claim": "The formal-verification result establishes the fee-adjusted constant-product invariant for arbitrary Uniswap V2 pairs across sequences of calls.",
+  "evidence_boundary": "The published proofs cover almost all single-call state transitions relative to specifications and assumptions. They do not prove multi-call contract invariants, arbitrary token semantics, sqrt correctness, or all behavior around unknown external calls.",
+  "decision": {
+    "question": "May the published formal-verification result be cited as proof of the contract-level x*y=k invariant for an arbitrary token pair?",
+    "expected": "No. The report expressly excludes that invariant and assumes token behavior; a new claim needs additional specifications and proofs."
+  },
+  "artifacts": [
+    {"id":"audit","kind":"audit","title":"Uniswap V2 audit report","url":"https://dapp.org.uk/reports/uniswapv2.html"},
+    {"id":"specs","kind":"formal specification","title":"K specifications for Uniswap V2","url":"https://github.com/dapp-org/k-uniswap-v2"},
+    {"id":"core","kind":"source","title":"Uniswap V2 core","url":"https://github.com/Uniswap/v2-core"}
+  ],
+  "edges": [
+    {"id":"spec-bytecode","relation":"proved against","from":"act/K single-call specifications","to":"built Uniswap V2 bytecode","status":"sourced","citations":["audit","specs","core"]},
+    {"id":"token-assumption","relation":"assumes","from":"proof claims","to":"token semantics matching UniswapV2ERC20","status":"sourced","citations":["audit"]},
+    {"id":"contract-invariant","relation":"proves","from":"published specifications","to":"multi-call constant-product invariant","status":"missing","citations":[]},
+    {"id":"arbitrary-token","relation":"applies unchanged to","from":"proof claims","to":"arbitrary token implementations","status":"missing","citations":[]}
+  ],
+  "missing_edges": ["A contract-level specification and proof for the fee-adjusted constant-product invariant across calls.", "A proof regenerated for token implementations that deviate from the assumed semantics."],
+  "packets": {
+    "control":"hub/packets/uniswap-proof-boundary/control.md",
+    "curated":"hub/packets/uniswap-proof-boundary/curated.md",
+    "questions":"hub/packets/uniswap-proof-boundary/questions.md",
+    "answer_key":"hub/packets/uniswap-proof-boundary/answer-key.md"
+  }
+}
