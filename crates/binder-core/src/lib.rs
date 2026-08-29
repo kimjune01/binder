@@ -141,6 +141,16 @@ pub struct Warrant {
     pub missing_trials: Vec<String>,
 }
 
+/// Stable receipt bytes used for identity. Struct field order and sorted map
+/// keys are part of receipt schema v1.
+pub fn canonical_receipt(bundle: &ReceiptBundle) -> Result<Vec<u8>, String> {
+    serde_json::to_vec(bundle).map_err(|error| format!("serialize canonical receipt: {error}"))
+}
+
+pub fn receipt_identity(bundle: &ReceiptBundle) -> Result<String, String> {
+    canonical_receipt(bundle).map(|bytes| hex_digest(&bytes))
+}
+
 pub fn validate_receipt(claim: &Claim, bundle: &ReceiptBundle) -> Result<(), String> {
     if bundle.schema_version != RECEIPT_SCHEMA_VERSION {
         return Err(format!(

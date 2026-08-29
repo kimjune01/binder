@@ -2,7 +2,8 @@ use std::fs;
 
 use binder_core::{
     Claim, DependencySnapshot, Evidence, EvidenceVerdict, ReceiptBundle, WarrantStatus,
-    changed_artifacts, evaluate, render_report, snapshot_dependencies, validate_receipt,
+    canonical_receipt, changed_artifacts, evaluate, receipt_identity, render_report,
+    snapshot_dependencies, validate_receipt,
 };
 use tempfile::tempdir;
 
@@ -162,6 +163,30 @@ fn valid_receipt() -> ReceiptBundle {
         ],
         status: WarrantStatus::Warranted,
     }
+}
+
+#[test]
+fn receipt_identity_is_deterministic_and_covers_observations() {
+    let first = valid_receipt();
+    let mut same = valid_receipt();
+    same.dependencies.files = [("source.rs".into(), "digest".into())]
+        .into_iter()
+        .collect();
+
+    assert_eq!(
+        canonical_receipt(&first).unwrap(),
+        canonical_receipt(&same).unwrap()
+    );
+    assert_eq!(
+        receipt_identity(&first).unwrap(),
+        receipt_identity(&same).unwrap()
+    );
+
+    same.head[0].observation = "different result".into();
+    assert_ne!(
+        receipt_identity(&first).unwrap(),
+        receipt_identity(&same).unwrap()
+    );
 }
 
 #[test]
