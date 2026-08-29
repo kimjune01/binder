@@ -168,6 +168,60 @@ They also repeatedly warn against collapsing those into “safe,” “verified,
 “audited.” This validates Binder's problem framing more strongly than it
 validates demand for Binder itself.
 
+The synthesized explanation is in [CONCERN_MAP.md](CONCERN_MAP.md).
+
+## Additional conversations sampled
+
+- [Foundry invariant assumptions](https://github.com/foundry-rs/foundry/issues/4190)
+  and [fuzzed-array assumptions](https://github.com/foundry-rs/foundry/discussions/3948):
+  the harness's input restrictions affect both feasibility and meaning.
+- [Foundry execution-version mismatch](https://github.com/foundry-rs/foundry/issues/6228):
+  compiler EVM target and fork execution environment were coupled even though
+  real deployments can require them to differ.
+- [Crytic's testing guidance](https://github.com/crytic/building-secure-contracts/blob/master/program-analysis/echidna/basic/common-testing-approaches.md):
+  mocks and simplified models can introduce false positives or hide real
+  failures, and must be maintained as code evolves.
+- [OpenZeppelin Primitive audit](https://www.openzeppelin.com/news/primitive-audit):
+  safe interaction depended on an atomic wrapper and usage discipline that was
+  not enforced by the underlying primitive.
+- [OpenZeppelin Endaoment audit](https://www.openzeppelin.com/news/endaoment-audit):
+  remediation changed enough code that fixing the findings created a new
+  re-audit question.
+- [OpenZeppelin Futureswap audit](https://www.openzeppelin.com/news/futureswap-v2-audit):
+  runtime bytecode matching did not cover creation code, initialization
+  parameters, or linked-library details.
+- [Stellar upgrade discussion](https://github.com/orgs/stellar/discussions/1670):
+  state migration makes rollback different from merely restoring an old Wasm
+  hash; metadata can itself create a false impression of upgradeability.
+- [OpenZeppelin Contracts usage boundary](https://github.com/OpenZeppelin/openzeppelin-contracts):
+  audited releases are distinguished from the moving branch, major storage
+  layouts may be incompatible, and library reuse is not an application audit.
+- [ERC-8004 Trustless Agents](https://ercs.ethereum.org/ERCS/erc-8004):
+  on-chain identity and public feedback cannot guarantee that advertised agent
+  capabilities work or are non-malicious; Sybil attacks remain possible.
+- [ERC-8273 Attestation-Gated Agentic Actions](https://ercs.ethereum.org/ERCS/erc-8273):
+  authorization can bind to a target, function, arguments, value, and nonce,
+  while attestor trust and evidence meaning remain explicitly out of scope.
+- [Solana wallet policies](https://platform.solana.com/docs/wallet-operations/policies):
+  caller permission and wallet permission are separate; concrete operations,
+  caps, allowlists, approval, and policy revisions constrain sign-time action.
+
+## Saturation record
+
+The search proceeded in four rounds:
+
+1. audit remediation, source verification, and invariant discussions;
+2. fuzzer assumptions, engine differences, and build provenance;
+3. composition, reusable libraries, registries, and agent authorization; and
+4. initialization, upgrades, storage migration, oracles, and badge semantics.
+
+Rounds one and two added distinct concern categories. Round three added the
+social-interface and concrete-action authorization categories. Round four
+added examples but no new category: initialization and migration refine subject
+identity and freshness; oracle changes refine dependency closure; badge
+semantics refine false-confidence risk. This is qualitative saturation for the
+product framing, not statistical prevalence.
+
 ## Questions not yet established publicly
 
 The current corpus does not yet tell us reliably:
