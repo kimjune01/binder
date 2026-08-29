@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 use std::env;
 use std::fs;
+use std::fs::OpenOptions;
 use std::io::{self, Write};
 use std::path::Path;
 use std::process::Command;
@@ -121,6 +122,7 @@ fn verify(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
             .unwrap_or(&receipt_dir)
             .display()
     ));
+    write_github_summary(warrant.status, &report)?;
     print!("{report}");
 
     if !matches!(warrant.status, binder_core::WarrantStatus::Warranted) {
@@ -213,11 +215,31 @@ fn status(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
         warrant.changed_dependencies.dedup();
     }
     let report = render_report(&loaded.claim, &warrant, &bundle.head);
+    write_github_summary(warrant.status, &report)?;
     print!("{report}");
     if !matches!(warrant.status, binder_core::WarrantStatus::Warranted) {
         std::process::exit(1);
     }
     Ok(())
+}
+
+fn write_github_summary(status: WarrantStatus, report: &str) -> Result<(), String> {
+    let Ok(path) = env::var("GITHUB_STEP_SUMMARY") else {
+        return Ok(());
+    };
+    let label = match status {
+        WarrantStatus::Warranted => "WARRANTED",
+        WarrantStatus::Failed => "FAILED",
+        WarrantStatus::Stale => "STALE",
+        WarrantStatus::Unsupported => "UNSUPPORTED",
+    };
+    let mut summary = OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&path)
+        .map_err(|error| format!("open GitHub step summary {path}: {error}"))?;
+    writeln!(summary, "## Binder: {label}\n\n```text\n{report}```\n")
+        .map_err(|error| format!("write GitHub step summary {path}: {error}"))
 }
 
 struct Execution {

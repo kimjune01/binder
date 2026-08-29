@@ -4,6 +4,7 @@ use std::process::Command;
 #[test]
 fn verify_packages_inputs_and_raw_trial_outputs() {
     let dir = tempfile::tempdir().unwrap();
+    let summary = dir.path().join("step-summary.md");
     fs::write(dir.path().join("input.txt"), "declared input").unwrap();
     fs::write(
         dir.path().join("claim.yaml"),
@@ -14,6 +15,7 @@ fn verify_packages_inputs_and_raw_trial_outputs() {
 
     let output = Command::new(env!("CARGO_BIN_EXE_binder-cli"))
         .args(["verify", "claim.yaml"])
+        .env("GITHUB_STEP_SUMMARY", &summary)
         .current_dir(dir.path())
         .output()
         .unwrap();
@@ -41,4 +43,10 @@ fn verify_packages_inputs_and_raw_trial_outputs() {
     let replay = fs::read_to_string(bundle.join("REPLAY.md")).unwrap();
     assert!(replay.contains("cd inputs"));
     assert!(replay.contains("bash scripts/replay.sh"));
+
+    let summary = fs::read_to_string(summary).unwrap();
+    assert!(summary.contains("## Binder: WARRANTED"));
+    assert!(summary.contains("fixed passes"));
+    assert!(summary.contains("Base  FAIL (expected; bug reproduced)"));
+    assert!(summary.contains("Head  PASS"));
 }
