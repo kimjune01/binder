@@ -1,0 +1,16 @@
+version: 2
+id: escrow-requires-both-approvals
+claim: Escrow funds move only when both parties approve the release.
+dependencies:
+  - demo/contract/escrow.rs
+  - demo/contract/check.rs
+  - demo/contract/check.sh
+  - demo/contract/claim.yaml
+required_trials: [unauthorized-release]
+trials:
+  - id: unauthorized-release
+    evidence_kind: empirical
+    command: [bash, demo/contract/check.sh]
+    overlay_from_head:
+      - demo/contract/check.rs
+      - demo/contract/check.sh
