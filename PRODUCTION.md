@@ -1,5 +1,7 @@
 # Binder production plan
 
+This plan is subordinate to the product boundary in [PRODUCT.md](PRODUCT.md) and the validation gate in [VALIDATION.md](VALIDATION.md).
+
 ## Product outcome
 
 Binder should help a Solana maintainer answer one release question:

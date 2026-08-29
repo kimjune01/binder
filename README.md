@@ -2,6 +2,8 @@
 
 Binder turns a small, named claim into locally replayable evidence. This demonstrator compares a deliberately broken vault revision with its fixed revision across a pure Rust transition check and a Mollusk runtime replay.
 
+See [PRODUCT.md](PRODUCT.md) for the canonical product framing and scope.
+
 ## Reproduce
 
 Prerequisite: [rustup](https://rustup.rs/). The replay script installs the pinned `cargo-build-sbf` version when necessary, builds both runtime artifacts before testing, runs the full workspace suite, verifies the claim twice, checks deterministic receipt bytes, and checks the recorded status.
