@@ -1,0 +1,16 @@
+[package]
+name = "vault-program"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[features]
+custom-heap = []
+custom-panic = []
+vulnerable = []
+
+[dependencies]
+solana-program.workspace = true

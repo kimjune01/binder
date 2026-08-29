@@ -3,6 +3,9 @@ id: failed-withdrawal-preserves-balances
 claim: An unsuccessful withdrawal cannot reduce the vault balance or increase the recipient balance.
 dependencies:
   - crates/vault-transition/src/lib.rs
+  - crates/vault-mollusk/src/lib.rs
+  - crates/vault-program/src/lib.rs
+  - scripts/mollusk-trial.sh
   - demo/specs/withdrawal.md
   - demo/fixtures/unauthorized-withdrawal.txt
   - rust-toolchain.toml
@@ -14,4 +17,4 @@ trials:
   - id: rust-transition-proof
     command: ["cargo", "run", "--quiet", "-p", "vault-transition", "--bin", "vault-trial", "--", "proof", "{revision}"]
   - id: runtime-replay
-    command: ["cargo", "run", "--quiet", "-p", "vault-transition", "--bin", "vault-trial", "--", "runtime", "{revision}"]
+    command: ["bash", "scripts/mollusk-trial.sh", "{revision}"]

@@ -1,0 +1,13 @@
+[package]
+name = "vault-mollusk"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+mollusk-svm.workspace = true
+solana-account.workspace = true
+solana-instruction.workspace = true
+solana-pubkey.workspace = true
+solana-sdk-ids.workspace = true
+solana-syscalls.workspace = true
