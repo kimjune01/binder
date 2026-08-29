@@ -47,3 +47,16 @@ fn rejects_unknown_manifest_fields() {
 
     assert!(load_claim(dir.path(), &path).is_err());
 }
+
+#[test]
+fn rejects_claim_ids_that_can_escape_the_receipt_directory() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("claim.yaml");
+    fs::write(
+        &path,
+        "version: 1\nid: ../../outside\nclaim: x\ndependencies: []\nrequired_trials: [x]\ntrials:\n  - id: x\n    command: [true]\n",
+    )
+    .unwrap();
+
+    assert!(load_claim(dir.path(), &path).is_err());
+}

@@ -111,6 +111,13 @@ pub fn load_claim(root: &Path, path: &Path) -> Result<LoadedClaim, String> {
     if parsed.id.trim().is_empty() || parsed.claim.trim().is_empty() {
         return Err("claim id and statement must not be empty".into());
     }
+    if !parsed
+        .id
+        .bytes()
+        .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_'))
+    {
+        return Err("claim id may contain only ASCII letters, digits, '-' and '_'".into());
+    }
     if parsed.required_trials.is_empty() {
         return Err("claim must require at least one trial".into());
     }
