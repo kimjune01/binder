@@ -1,0 +1,108 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { loadCases, type PublicCase } from "../../lib/cases";
+import { parseQuestions } from "../../lib/validation";
+
+const questionModules = import.meta.glob("../../data/packets/*/questions.md", {
+  eager: true,
+  query: "?raw",
+  import: "default",
+}) as Record<string, string>;
+
+export async function getStaticPaths() {
+  return (await loadCases()).map((item) => ({ params: { id: item.id }, props: { item } }));
+}
+
+interface Props { item: PublicCase }
+const { item } = Astro.props;
+const questionEntry = Object.entries(questionModules).find(([path]) => path.includes(`/packets/${item.id}/`));
+const questions = parseQuestions(questionEntry?.[1] ?? "");
+if (questions.length !== 5) throw new Error(`Expected five validation questions for ${item.id}`);
+---
+
+<Layout title={`Validation task: ${item.title} — Binder`} description="Compare raw and curated smart-contract evidence.">
+  <nav><a href={`/cases/${item.id}/`}>← Case page</a><span>Validation task</span></nav>
+
+  <header class="hero case-hero">
+    <p class="eyebrow">Binder interface study · {item.ecosystem}</p>
+    <h1>{item.title}</h1>
+    <p class="lede">Use only the assigned packet and any sources it links. Answer as you would during a real review.</p>
+  </header>
+
+  <main class="case-body validation" data-case-id={item.id}>
+    <section class="instructions">
+      <h2>1. Review the assigned evidence</h2>
+      <p>Your condition is assigned once in this browser. Open the packet in a new tab, then return here.</p>
+      <a class="packet-button" data-packet-link target="_blank" rel="noopener">Open assigned packet ↗</a>
+    </section>
+
+    <form data-validation-form>
+      <section>
+        <h2>2. Record your conclusions</h2>
+        {questions.map((question, index) => (
+          <label class="response-field">
+            <span>{index + 1}. {question}</span>
+            <textarea name={`answer-${index + 1}`} rows="4" required></textarea>
+          </label>
+        ))}
+      </section>
+
+      <section class="study-meta">
+        <h2>3. Record the review effort</h2>
+        <label>Sources opened<input name="sources-opened" type="number" min="0" step="1" required /></label>
+        <label>Confidence (1–5)<input name="confidence" type="number" min="1" max="5" step="1" required /></label>
+        <button type="submit">Finish and export result</button>
+        <p class="form-note">Nothing is uploaded. Binder downloads one JSON result for you to share manually.</p>
+      </section>
+    </form>
+
+    <section data-complete hidden>
+      <h2>Result exported</h2>
+      <p>Now compare your reasoning with the answer key. Keep the JSON file; it contains the assigned condition and elapsed time.</p>
+      <a href={`/cases/${item.id}/answer-key.md`} target="_blank">Open answer key ↗</a>
+    </section>
+  </main>
+
+  <script is:inline define:vars={{ caseId: item.id }}>
+    const root = document.querySelector("[data-case-id]");
+    const form = document.querySelector("[data-validation-form]");
+    const packetLink = document.querySelector("[data-packet-link]");
+    const complete = document.querySelector("[data-complete]");
+    const storageKey = `binder-validation:${caseId}`;
+    const saved = JSON.parse(sessionStorage.getItem(storageKey) || "null");
+    const assignment = saved || {
+      condition: Math.random() < 0.5 ? "control" : "curated",
+      started_at: new Date().toISOString(),
+    };
+    sessionStorage.setItem(storageKey, JSON.stringify(assignment));
+    packetLink.href = `/cases/${caseId}/${assignment.condition}.md`;
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const values = new FormData(form);
+      const completedAt = new Date();
+      const result = {
+        schema_version: 1,
+        case_id: caseId,
+        condition: assignment.condition,
+        started_at: assignment.started_at,
+        completed_at: completedAt.toISOString(),
+        elapsed_seconds: Math.max(0, Math.round((completedAt.getTime() - Date.parse(assignment.started_at)) / 1000)),
+        sources_opened: Number(values.get("sources-opened")),
+        confidence: Number(values.get("confidence")),
+        answers: [1, 2, 3, 4, 5].map((number) => String(values.get(`answer-${number}`)).trim()),
+      };
+      const blob = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const download = document.createElement("a");
+      download.href = url;
+      download.download = `binder-validation-${caseId}-${assignment.condition}.json`;
+      download.click();
+      URL.revokeObjectURL(url);
+      form.hidden = true;
+      complete.hidden = false;
+      root.scrollIntoView({ behavior: "smooth" });
+    });
+  </script>
+</Layout>

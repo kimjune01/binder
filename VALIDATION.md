@@ -29,13 +29,22 @@ The hypothesis is:
 
 ## Method
 
-Prepare five paired, self-contained review tasks using real fixes. Each task
-compares:
+Phase 0B uses the five public case fixtures as paired, self-contained review
+tasks. Each task compares:
 
-- **Control:** normal PR description, diff, and CI/test output.
-- **Binder:** the same material plus the Binder report and replay bundle.
+- **Control:** canonical public sources with minimal orientation.
+- **Curated:** the same public record joined into explicit claims, evidence
+  boundaries, sourced or inferred edges, and missing edges.
 
-Use asynchronous tasks first and alternate which condition appears first. Do
+Start a task from `/validate/<case-id>/`. The static runner assigns one
+condition per browser session, starts the timer, presents the fixed questions,
+and downloads a local JSON result. It does not upload participant data. Score
+the prose answers against the case answer key after submission; do not reveal
+the key during the task.
+
+Use asynchronous tasks first and randomize the condition. For paired testing,
+give the same participant another case in the other condition; do not show both
+versions of one case to the same reader before recording an answer. Do
 not explain Binder before the participant makes an initial interpretation; the
 report must carry its own meaning. Prefer observable submitted answers,
 reproduction logs, corrections, citations, and repository changes. Run at most
@@ -137,15 +146,18 @@ If comprehension improves but decisions do not, improve the report before buildi
 
 ## Study artifacts
 
-For each case, preserve:
+For each case, preserve the committed packet files and collect exported results
+outside the public repository:
 
 ```text
-validation/cases/<case-id>/
-  context.md             # repository, change, expected decision
-  control.md             # ordinary PR and CI material
-  binder.md              # Binder-enhanced material
-  answer-key.md          # seeded issue and guarantee boundary
-  sessions/<participant>.md
+hub/src/data/packets/<case-id>/
+  control.md
+  curated.md
+  questions.md
+  answer-key.md
+
+private-results/
+  <anonymous-participant>-<case-id>.json
 ```
 
 Do not commit private repository material or participant identity. Use stable anonymous participant IDs and link to restricted source material outside this repository when necessary.

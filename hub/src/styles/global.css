@@ -25,4 +25,12 @@ mark.sourced { background:#dcebdd; color:#174e2f; } mark.inferred { background:#
 .packet-grid a { display:flex; flex-direction:column; padding:14px; border:1px solid var(--line); text-decoration:none; }
 .packet-grid span { color:var(--muted); font-size:.85rem; }
 footer { margin-top:72px; padding-top:18px; border-top:1px solid var(--line); color:var(--muted); font-size:.85rem; }
+.packet-button,button { display:inline-block; padding:.7rem 1rem; border:1px solid var(--accent); border-radius:3px; background:var(--accent); color:white; font:700 .9rem/1.2 ui-sans-serif,system-ui,sans-serif; text-decoration:none; cursor:pointer; }
+.validation section { padding-bottom:38px; }
+.response-field { display:block; margin:1.5rem 0; font-weight:650; }
+.response-field span { display:block; margin-bottom:.45rem; }
+textarea,input { width:100%; margin-top:.35rem; padding:.65rem; border:1px solid #aaa69b; border-radius:3px; background:#fffdf7; color:var(--ink); font:inherit; }
+.study-meta { display:grid; gap:1rem; }.study-meta label { max-width:240px; }.study-meta button { justify-self:start; }
+.form-note { color:var(--muted); font-size:.85rem; }
+[hidden] { display:none !important; }
 @media (max-width:560px) { body{padding-top:28px}.packet-grid{grid-template-columns:1fr}.artifacts span{display:block}.artifacts code{display:block;margin:.2rem 0} }
