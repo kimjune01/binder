@@ -10,7 +10,9 @@ It preserves an attributed base/refutation → candidate/standing rule, runs the
 
 The original, deeper demonstrator compares a deliberately broken Solana vault revision with its fixed revision across a pure Rust transition check and a Mollusk runtime replay.
 
-See [PRODUCT.md](PRODUCT.md) for the canonical product framing and scope.
+See [PRODUCT.md](PRODUCT.md) for the canonical product framing and scope, and
+[VISION.md](VISION.md) for the longer-term vision of independently verified
+agreements.
 
 ## Reproduce
 

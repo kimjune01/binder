@@ -1,5 +1,8 @@
 # Binder product framing and scope
 
+This document defines the product wedge and near-term boundary. [VISION.md](VISION.md)
+describes the broader possibility it may eventually support.
+
 ## Product definition
 
 **Binder lets humans frontload judgment into verifiable claims, then materializes the evidence graph on command.**
