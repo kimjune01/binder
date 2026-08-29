@@ -18,3 +18,4 @@ trials:
     command: ["cargo", "run", "--quiet", "-p", "vault-transition", "--bin", "vault-trial", "--", "proof", "{revision}"]
   - id: runtime-replay
     command: ["bash", "scripts/mollusk-trial.sh", "{revision}"]
+    artifacts: ["target/deploy/{revision}/vault_program.so"]

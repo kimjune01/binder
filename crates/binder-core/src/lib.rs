@@ -28,6 +28,8 @@ pub struct LoadedClaim {
 pub struct Trial {
     pub id: String,
     pub command: Vec<String>,
+    #[serde(default)]
+    pub artifacts: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -60,6 +62,14 @@ pub struct Evidence {
     pub trial_id: String,
     pub verdict: EvidenceVerdict,
     pub dependencies: DependencySnapshot,
+    #[serde(default)]
+    pub command: Vec<String>,
+    #[serde(default)]
+    pub stdout_sha256: String,
+    #[serde(default)]
+    pub stderr_sha256: String,
+    #[serde(default)]
+    pub artifacts: BTreeMap<String, String>,
 }
 
 impl Evidence {
@@ -72,7 +82,25 @@ impl Evidence {
             trial_id: trial_id.into(),
             verdict,
             dependencies,
+            command: Vec::new(),
+            stdout_sha256: String::new(),
+            stderr_sha256: String::new(),
+            artifacts: BTreeMap::new(),
         }
+    }
+
+    pub fn with_observation(
+        mut self,
+        command: Vec<String>,
+        stdout: &[u8],
+        stderr: &[u8],
+        artifacts: BTreeMap<String, String>,
+    ) -> Self {
+        self.command = command;
+        self.stdout_sha256 = hex_digest(stdout);
+        self.stderr_sha256 = hex_digest(stderr);
+        self.artifacts = artifacts;
+        self
     }
 }
 
@@ -191,6 +219,21 @@ pub fn snapshot_dependencies(root: &Path, paths: &[&str]) -> io::Result<Dependen
         identity: hex_digest(&preimage),
         files,
     })
+}
+
+pub fn changed_artifacts(root: &Path, evidence: &[Evidence]) -> io::Result<Vec<String>> {
+    let mut changed = BTreeSet::new();
+    for item in evidence {
+        for (path, recorded_digest) in &item.artifacts {
+            match fs::read(root.join(path)) {
+                Ok(bytes) if hex_digest(&bytes) == *recorded_digest => {}
+                Ok(_) | Err(_) => {
+                    changed.insert(path.clone());
+                }
+            }
+        }
+    }
+    Ok(changed.into_iter().collect())
 }
 
 pub fn evaluate(

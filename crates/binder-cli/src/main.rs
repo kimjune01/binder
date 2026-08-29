@@ -1,9 +1,14 @@
+use std::collections::BTreeMap;
 use std::env;
 use std::fs;
+use std::io::{self, Write};
 use std::path::Path;
 use std::process::Command;
 
-use binder_core::{Evidence, EvidenceVerdict, ReceiptBundle, evaluate, load_claim, render_report};
+use binder_core::{
+    Evidence, EvidenceVerdict, ReceiptBundle, WarrantStatus, changed_artifacts, evaluate,
+    load_claim, render_report,
+};
 
 fn main() {
     if let Err(error) = run() {
@@ -32,27 +37,43 @@ fn verify(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
     let mut head = Vec::new();
 
     for trial in &loaded.trials {
-        let base_passed = execute(root, &trial.command, "vulnerable")?;
-        base.push(Evidence::new(
-            &trial.id,
-            if base_passed {
-                EvidenceVerdict::Fail
-            } else {
-                EvidenceVerdict::ExpectedFail
-            },
-            loaded.snapshot.clone(),
-        ));
+        let base_result = execute(root, trial, "vulnerable")?;
+        base.push(
+            Evidence::new(
+                &trial.id,
+                if base_result.passed {
+                    EvidenceVerdict::Fail
+                } else {
+                    EvidenceVerdict::ExpectedFail
+                },
+                loaded.snapshot.clone(),
+            )
+            .with_observation(
+                base_result.command,
+                &base_result.stdout,
+                &base_result.stderr,
+                base_result.artifacts,
+            ),
+        );
 
-        let head_passed = execute(root, &trial.command, "fixed")?;
-        head.push(Evidence::new(
-            &trial.id,
-            if head_passed {
-                EvidenceVerdict::Pass
-            } else {
-                EvidenceVerdict::Fail
-            },
-            loaded.snapshot.clone(),
-        ));
+        let head_result = execute(root, trial, "fixed")?;
+        head.push(
+            Evidence::new(
+                &trial.id,
+                if head_result.passed {
+                    EvidenceVerdict::Pass
+                } else {
+                    EvidenceVerdict::Fail
+                },
+                loaded.snapshot.clone(),
+            )
+            .with_observation(
+                head_result.command,
+                &head_result.stdout,
+                &head_result.stderr,
+                head_result.artifacts,
+            ),
+        );
     }
 
     let warrant = evaluate(&loaded.claim, &loaded.snapshot, &base, &head);
@@ -120,7 +141,21 @@ fn status(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
     if bundle.claim_id != loaded.claim.id {
         return Err("receipt claim id does not match requested claim".into());
     }
-    let warrant = evaluate(&loaded.claim, &loaded.snapshot, &bundle.base, &bundle.head);
+    let mut warrant = evaluate(&loaded.claim, &loaded.snapshot, &bundle.base, &bundle.head);
+    let artifacts = bundle
+        .base
+        .iter()
+        .chain(&bundle.head)
+        .cloned()
+        .collect::<Vec<_>>();
+    let changed = changed_artifacts(root, &artifacts)
+        .map_err(|error| format!("validate receipt artifacts: {error}"))?;
+    if !changed.is_empty() {
+        warrant.status = WarrantStatus::Stale;
+        warrant.changed_dependencies.extend(changed);
+        warrant.changed_dependencies.sort();
+        warrant.changed_dependencies.dedup();
+    }
     let report = render_report(&loaded.claim, &warrant, &bundle.head);
     print!("{report}");
     if !matches!(warrant.status, binder_core::WarrantStatus::Warranted) {
@@ -129,20 +164,53 @@ fn status(root: &Path, loaded: binder_core::LoadedClaim) -> Result<(), String> {
     Ok(())
 }
 
-fn execute(root: &Path, command: &[String], revision: &str) -> Result<bool, String> {
-    let args = command
+struct Execution {
+    passed: bool,
+    command: Vec<String>,
+    stdout: Vec<u8>,
+    stderr: Vec<u8>,
+    artifacts: BTreeMap<String, String>,
+}
+
+fn execute(root: &Path, trial: &binder_core::Trial, revision: &str) -> Result<Execution, String> {
+    let args = trial
+        .command
         .iter()
         .map(|arg| arg.replace("{revision}", revision))
         .collect::<Vec<_>>();
     let (program, arguments) = args
         .split_first()
         .ok_or_else(|| "trial command is empty".to_owned())?;
-    let status = Command::new(program)
+    let output = Command::new(program)
         .args(arguments)
         .current_dir(root)
-        .status()
+        .output()
         .map_err(|error| format!("execute {program}: {error}"))?;
-    Ok(status.success())
+    io::stdout()
+        .write_all(&output.stdout)
+        .map_err(|error| format!("write trial stdout: {error}"))?;
+    io::stderr()
+        .write_all(&output.stderr)
+        .map_err(|error| format!("write trial stderr: {error}"))?;
+    let artifact_paths = trial
+        .artifacts
+        .iter()
+        .map(|path| path.replace("{revision}", revision))
+        .collect::<Vec<_>>();
+    let path_refs = artifact_paths
+        .iter()
+        .map(String::as_str)
+        .collect::<Vec<_>>();
+    let artifacts = binder_core::snapshot_dependencies(root, &path_refs)
+        .map_err(|error| format!("snapshot trial artifacts: {error}"))?
+        .files;
+    Ok(Execution {
+        passed: output.status.success(),
+        command: args,
+        stdout: output.stdout,
+        stderr: output.stderr,
+        artifacts,
+    })
 }
 
 fn aggregate_label(evidence: &[Evidence], expected: EvidenceVerdict) -> &'static str {

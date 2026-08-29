@@ -17,6 +17,10 @@ fn parses_the_demo_claim_and_renders_a_reviewer_sized_warrant() {
             .contains(&"rust-toolchain.toml".to_owned())
     );
     assert_eq!(manifest.trials.len(), 2);
+    assert_eq!(
+        manifest.trials[1].artifacts,
+        vec!["target/deploy/{revision}/vault_program.so"]
+    );
 
     let evidence = manifest
         .claim

@@ -1,8 +1,8 @@
 use std::fs;
 
 use binder_core::{
-    Claim, DependencySnapshot, Evidence, EvidenceVerdict, WarrantStatus, evaluate,
-    snapshot_dependencies,
+    Claim, DependencySnapshot, Evidence, EvidenceVerdict, WarrantStatus, changed_artifacts,
+    evaluate, snapshot_dependencies,
 };
 use tempfile::tempdir;
 
@@ -11,6 +11,35 @@ fn claim() -> Claim {
         id: "failed-withdrawal-preserves-balances".into(),
         required_trials: vec!["rust-transition-proof".into(), "runtime-replay".into()],
     }
+}
+
+#[test]
+fn changed_runtime_artifact_is_reported_stale() {
+    let dir = tempdir().unwrap();
+    fs::write(dir.path().join("program.so"), "first").unwrap();
+    let artifacts = snapshot_dependencies(dir.path(), &["program.so"])
+        .unwrap()
+        .files;
+    let evidence = Evidence::new(
+        "runtime-replay",
+        EvidenceVerdict::Pass,
+        DependencySnapshot {
+            identity: "inputs".into(),
+            files: Default::default(),
+        },
+    )
+    .with_observation(Vec::new(), b"", b"", artifacts);
+
+    assert!(
+        changed_artifacts(dir.path(), &[evidence.clone()])
+            .unwrap()
+            .is_empty()
+    );
+    fs::write(dir.path().join("program.so"), "tampered").unwrap();
+    assert_eq!(
+        changed_artifacts(dir.path(), &[evidence]).unwrap(),
+        vec!["program.so"]
+    );
 }
 
 fn passing_evidence(snapshot: &DependencySnapshot) -> Vec<Evidence> {
