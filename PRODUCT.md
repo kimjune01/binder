@@ -2,9 +2,20 @@
 
 ## Product definition
 
-**Binder makes agent-produced software claims independently inheritable.**
+**Binder lets humans frontload judgment into verifiable claims, then materializes the evidence graph on command.**
 
-A producer presents a consequential code change with a named claim, the check that could refute it, the exact roots the check used, and a receipt another party can replay. The receiver does not have to trust the producer's account of its work or reconstruct the justification from a diff and a green CI run.
+A human states the consequential judgment once: which observations would entitle a specific claim, about which subject, under which assumptions. Binder preserves that entitlement edge, invokes the existing deterministic tools around it, and records the resulting witnesses and receipts. A receiver can inspect or replay the same graph without trusting the producer's narrative or reconstructing it from a diff and green CI run.
+
+```text
+human judgment
+  authors: observations ──warrant──▶ claim
+                              |
+                              v
+Binder on command
+  resolves subject → roots → checks → executions → witnesses → policy
+```
+
+Binder does not automate away human judgment. It moves judgment to the point where it can be made explicit, preserved, and reused; the mechanical work after that becomes smooth and repeatable.
 
 The product wedge is an **evidence-carrying change**:
 
@@ -20,21 +31,21 @@ agent or developer
           accepts, rejects, or requests evidence
 ```
 
-Binder is the software-change application of the verification primitive described in *Verifiable Knowledge*: a claim that travels with the falsifiable check another agent can rerun.
+Binder is the software-change application of the verification primitive described in *Verifiable Knowledge*: preserve the authored entitlement edge, then populate the verifiable graph needed to evaluate it.
 
 ## Problem
 
-Agents can produce changes faster than humans can reconstruct their justification. A passing check says that something ran successfully; it does not say which claim the check supports, whether it would detect the original defect, which system version it covered, or whether later changes invalidated it.
+Smart-contract development already contains many deterministic components: Git revisions, compilers, test runners, simulators, fuzzers, provers, build hashes, and reproducible chain execution. The friction and uncertainty live between them. A passing check does not say which claim it supports, why its observation warrants that claim, whether it detects the original defect, which exact subject it covered, or whether the deployed artifact inherits the result.
 
-Today the receiver must either trust the author's summary or repeat the investigation from the beginning. Provenance logs improve accountability for what happened, but do not establish that a belief earned entitlement.
+Those handoffs are reconstructed repeatedly from issue prose, test names, CI configuration, logs, audit reports, and reviewer memory. Agents widen this coordination gap by producing code and checks faster than humans can inspect their correspondence. Provenance can establish what ran; it does not preserve why the resulting observation entitles the claim.
 
 ## Initial user and decision
 
-The initial user is a maintainer reviewing a consequential, agent-assisted software change. Smart-contract maintainers are the first domain because their important claims are unusually explicit, changes are costly to get wrong, and source/runtime evidence is often split across tools.
+The initial user is a maintainer, auditor, or receiving agent reviewing a consequential smart-contract change. Smart contracts are the first domain because they already depend on verifiable execution, yet intent, specifications, tests, audit findings, source builds, and deployed artifacts remain connected by informal human handoffs.
 
 The decision Binder supports is narrow:
 
-> Is this specific claim about this specific change currently supported by checks I can inspect or replay?
+> Does the current rooted evidence satisfy the authored warrant rule for this specific claim and change?
 
 Binder does not answer whether the entire program is safe, whether the change should ship for business reasons, or whether the authored claim is complete.
 
@@ -48,15 +59,35 @@ Every Binder claim must carry:
 | Subject | The exact base and candidate revisions or artifacts being compared |
 | Check | An executable procedure whose result bears on the claim |
 | Oracle | The expected base and candidate outcomes, including what counts as refutation |
+| Entitlement edge | The authored rule stating which typed observations warrant the claim |
 | Roots | Source, specification, fixture, toolchain, environment, and artifact inputs |
 | Kill condition | A failed check or changed root that removes the claim's current entitlement |
 | Receipt | The versioned, content-addressed observation produced by running the check |
 | Replay | Instructions and inputs sufficient for a receiver to rerun the observation |
-| Entitlement | Whether the claim-specific observation stood, broke, or produced no verdict |
 | Freshness | Whether the receipt addresses the exact current subject and roots |
 | Policy | Whether the available current evidence crosses the action threshold for this context |
 
-`WARRANTED` is a policy decision: the required current evidence crosses the configured threshold for action. It is not a truth value, whole-program safety, or final truth.
+The entitlement edge is the irreducible human contribution. Binder may help compile it from acceptance criteria, an audit finding, or a contract specification, but must never silently invent or strengthen it. `WARRANTED` is a policy decision: the required current evidence crosses the configured threshold for action. It is not a truth value, whole-program safety, or final truth.
+
+## Evidence graph
+
+A Binder claim declares only its immediate dependencies. On `verify`, Binder resolves and materializes the relevant local graph:
+
+```text
+claim instance
+  ├── authored entitlement rule
+  ├── exact subject
+  ├── rooted specification and fixtures
+  └── required observations
+        └── evidence producers
+              └── executions
+                    └── typed witnesses
+                          └── receipt and policy evaluation
+```
+
+Some edges are authored judgments; others are mechanically derived identities or execution results. Receipts must preserve that distinction and attribute authored edges. Identical current nodes may be reused; changed roots create a new claim instance rather than mutating the old result.
+
+This is not initially a global knowledge graph or shared canon. It is the smallest claim-specific graph needed to make a review decision, populated locally and on demand.
 
 ## Epistemic model
 
@@ -64,7 +95,7 @@ Binder separates three questions that ordinary CI collapses:
 
 ```text
 Did the check execute?       execution
-What did it observe?         entitlement
+What did it observe?         observation
 May we act on that evidence? policy
 ```
 
@@ -162,7 +193,7 @@ PolicyEvaluation
   warranted decision
 ```
 
-The current demo uses process success as its observation boundary and exposes `WARRANTED`, `FAILED`, `STALE`, and `UNSUPPORTED` as combined statuses. That is acceptable demonstration scaffolding, not the target production contract. Production work must introduce the separation above before freezing another receipt schema.
+The typed demo implements this separation for empirical base/candidate checks. Production work must extend it without collapsing execution, observation, authored entitlement, freshness, and policy back into one status.
 
 ## Why this is more than CI
 
@@ -181,7 +212,7 @@ The differentiated operations are therefore:
 3. **Invalidate:** withdraw entitlement when a rooted input changes.
 4. **Transmit:** package the claim and receipt so another party can inspect or replay it.
 
-Running tests is commodity infrastructure. Maintaining the claim–evidence–subject relationship is the product.
+Running tests is commodity infrastructure. Preserving the entitlement edge while materializing the claim–evidence–subject graph is the product.
 
 ## Interface strategy
 
@@ -311,6 +342,7 @@ Program metadata and explorers are later discovery interfaces. They should consu
 ### Must have
 
 - A versioned machine claim compiled from an issue, pull request, audit finding, or small explicit manifest.
+- An explicit, attributable entitlement rule that Binder preserves rather than infers from tool success.
 - Real repository base and candidate revision identity.
 - Explicit expected outcomes and claim-specific observations.
 - Typed execution, observation, freshness, and policy fields; no semantic verdict inferred from a process exit code alone.
@@ -342,18 +374,20 @@ Program metadata and explorers are later discovery interfaces. They should consu
 - Hosted execution of arbitrary repository commands.
 - A universal security score.
 - A wallet, explorer, dashboard, marketplace, or billing system.
-- A global hypothesis graph or shared canon.
+- A global hypothesis graph or shared canon; v1 materializes only local claim-specific evidence graphs.
 - Social identity, reputation, staking, or governance mechanisms.
 
 These exclusions preserve the falsifiable wedge: if evidence-carrying changes do not improve real review decisions, broader infrastructure has no product foundation.
 
 ## Relationship to verifiable knowledge
 
-Binder implements a deliberately small part of the full protocol.
+Binder implements a deliberately small, operational part of the full protocol.
 
 ### Implemented or directly in scope
 
 - replayable check;
+- an explicit, attributable entitlement edge;
+- on-demand materialization of a claim-specific evidence graph;
 - rooted provenance;
 - system-facing kill condition;
 - replay by a receiver who need not trust the author;
@@ -362,7 +396,7 @@ Binder implements a deliberately small part of the full protocol.
 
 ### Future protocol layers
 
-- claim-to-claim provenance and downstream refutation;
+- graph expansion through claim-to-claim provenance and downstream refutation;
 - typed terminal witnesses for empirical roots;
 - engineered independence across model families, operators, or evidence engines;
 - declared replay cost and selective verification;
@@ -386,6 +420,7 @@ This framing should acknowledge the assurance-case lineage rather than claim the
 
 ## User stories
 
+- As a domain expert, I want to state once what observations would warrant a claim so that agents can rerun the deterministic work without repeatedly asking me to reconstruct the reasoning.
 - As a maintainer, I want to know whether a proposed check fails on the buggy revision so that I do not mistake a generic green test for evidence of the fix.
 - As a receiving agent, I want the claim, roots, command, and oracle in a machine-readable record so that I can inherit work without trusting the producing agent's summary.
 - As an agent, I want a non-interactive inspection command and stable JSON errors so that I can plan, execute, and recover without parsing human terminal text.
@@ -403,6 +438,7 @@ Before expanding beyond the local workflow:
 - Binder improves correct review decisions or weak-evidence detection in at least three of five paired cases.
 - At least four of five first-time reviewers accurately state both the claim and its guarantee boundary.
 - Turning a suitable existing regression test into a claim takes under 15 active minutes.
+- A reviewer can recover why the evidence bears on the claim without reconstructing the handoffs among issue, test, CI log, and artifact.
 - At least two teams keep Binder enabled through a second real change.
 - The receiver can replay at least 80% of pilot claims in a clean environment without private help.
 
@@ -412,11 +448,15 @@ The primary metric is **consequential changes reviewed with current, independent
 
 Use:
 
-> Binder turns an agent's software claim into evidence another agent or reviewer can independently check.
+> Binder lets humans state what would warrant a software claim once, then builds and evaluates the evidence graph for each change.
 
 For smart contracts:
 
-> Binder tells a reviewer whether a specific claim about a contract change has current, replayable support for the exact revision and artifact under review.
+> Binder carries intent across the smart-contract toolchain: from an authored claim, through checks and witnesses, to the exact revision and artifact under review.
+
+Short form:
+
+> Frontload the judgment. Verify the graph on demand.
 
 Avoid:
 
@@ -430,7 +470,7 @@ Those descriptions either broaden the guarantee beyond the evidence or lead with
 
 ## Open questions
 
-1. Will maintainers author and maintain claims, or must claims be generated from existing tests and issue context?
+1. Who is entitled to author or revise the warrant rule, and how should Binder attribute that judgment without introducing a governance system?
 2. Is base/candidate contrast sufficient, or must v1 also compare against a developer gold fix to detect candidate-specific checks?
 3. What is the smallest typed witness contract that works across existing test frameworks without creating a Binder testing DSL?
 4. Which roots can be discovered automatically without hiding consequential assumptions?
