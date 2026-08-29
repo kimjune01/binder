@@ -142,9 +142,9 @@ The primary metric is **program upgrades reviewed with current Binder claims**, 
 
 ## Immediate implementation sequence
 
-1. Freeze and document receipt schema v1, CLI exit codes, and JSON output contract.
-2. Add failing acceptance tests for `binder init` and `--format json`.
-3. Implement those CLI surfaces and release cross-platform binaries.
+1. ~~Freeze and document receipt schema v1, CLI exit codes, and JSON output contract.~~
+2. Add failing acceptance tests for `binder init`.
+3. Implement that CLI surface and release cross-platform binaries.
 4. Build the GitHub Action against the released binary.
 5. Onboard the first real repository before starting the registry.
 
