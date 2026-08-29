@@ -12,6 +12,7 @@ use sha2::{Digest, Sha256};
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Claim {
     pub id: String,
+    pub statement: String,
     pub required_trials: Vec<String>,
 }
 
@@ -250,6 +251,7 @@ pub fn load_claim(root: &Path, path: &Path) -> Result<LoadedClaim, String> {
     Ok(LoadedClaim {
         claim: Claim {
             id: parsed.id,
+            statement: parsed.claim,
             required_trials: parsed.required_trials,
         },
         dependency_paths: parsed.dependencies,
@@ -373,6 +375,7 @@ pub fn evaluate(
 
 pub fn render_report(claim: &Claim, warrant: &Warrant, evidence: &[Evidence]) -> String {
     let mut report = format!("{}  {}\n", status_label(warrant.status), claim.id);
+    writeln!(&mut report, "{}", claim.statement).expect("writing to a string cannot fail");
     if !warrant.changed_dependencies.is_empty() {
         report.push_str("\nChanged\n");
         for path in &warrant.changed_dependencies {

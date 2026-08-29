@@ -9,6 +9,7 @@ use tempfile::tempdir;
 fn claim() -> Claim {
     Claim {
         id: "failed-withdrawal-preserves-balances".into(),
+        statement: "Failed withdrawals preserve balances.".into(),
         required_trials: vec!["rust-transition-proof".into(), "runtime-replay".into()],
     }
 }

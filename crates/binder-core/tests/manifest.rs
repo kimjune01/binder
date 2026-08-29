@@ -11,6 +11,10 @@ fn parses_the_demo_claim_and_renders_a_reviewer_sized_warrant() {
     )
     .unwrap();
     assert_eq!(manifest.claim.id, "failed-withdrawal-preserves-balances");
+    assert_eq!(
+        manifest.claim.statement,
+        "An unsuccessful withdrawal cannot reduce the vault balance or increase the recipient balance."
+    );
     assert!(
         manifest
             .dependency_paths
@@ -33,6 +37,9 @@ fn parses_the_demo_claim_and_renders_a_reviewer_sized_warrant() {
 
     assert_eq!(warrant.status, WarrantStatus::Warranted);
     assert!(report.starts_with("WARRANTED  failed-withdrawal-preserves-balances"));
+    assert!(report.contains(
+        "An unsuccessful withdrawal cannot reduce the vault balance or increase the recipient balance."
+    ));
     assert!(report.contains("PASS  rust-transition-proof"));
     assert!(report.contains("PASS  runtime-replay"));
     assert!(!report.contains(&manifest.snapshot.identity));
