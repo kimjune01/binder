@@ -2,8 +2,19 @@ version: 1
 id: failed-withdrawal-preserves-balances
 claim: An unsuccessful withdrawal cannot reduce the vault balance or increase the recipient balance.
 dependencies:
+  - demo/claims/failed-withdrawal-preserves-balances.yaml
+  - Cargo.toml
+  - crates/binder-cli/Cargo.toml
+  - crates/binder-cli/src/main.rs
+  - crates/binder-core/Cargo.toml
+  - crates/binder-core/src/lib.rs
+  - crates/vault-transition/Cargo.toml
   - crates/vault-transition/src/lib.rs
+  - crates/vault-transition/src/bin/vault-trial.rs
+  - crates/vault-mollusk/Cargo.toml
   - crates/vault-mollusk/src/lib.rs
+  - crates/vault-mollusk/src/bin/mollusk-trial.rs
+  - crates/vault-program/Cargo.toml
   - crates/vault-program/src/lib.rs
   - scripts/mollusk-trial.sh
   - demo/specs/withdrawal.md

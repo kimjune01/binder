@@ -44,12 +44,16 @@ Preferred engine: Flux, provided the pinned version can verify the example repro
 
 Mollusk executes the compiled instruction with concrete accounts and an unauthorized-withdrawal fixture. The checker asserts:
 
-- the instruction fails;
+- the instruction records an application-level rejection;
 - the vault balance is unchanged;
 - the recipient balance is unchanged; and
 - the relevant account data and return data match the declared predicate.
 
 This checks the integration boundary that the pure transition proof abstracts away.
+The SVM instruction itself returns success because Solana rolls back account
+writes on an instruction error. The vulnerable program instead exposes the bug
+by recording rejection in account state while committing the transfer; the
+fixed program records rejection and preserves balances.
 
 ### 3. Artifact identity
 
@@ -251,4 +255,3 @@ Reconsider the product boundary if any of these survive honest attempts:
 - The source/runtime evidence cannot share a meaningful semantic claim without a large trusted translation layer.
 - Clean-machine replay requires so much environment reconstruction that a receipt is no cheaper to verify than manually redoing the investigation.
 - Reviewers cannot correctly explain the report's guarantee and limitations after the 90-second walkthrough.
-
