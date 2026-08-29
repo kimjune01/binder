@@ -138,6 +138,76 @@ Each party may use different agents, evidence policies, and private context.
 They need not trust the same evaluator. They must converge only on the exact
 package they are willing to sign.
 
+## Adoption hurdles
+
+The technical primitives are largely available. Adoption depends on reducing
+the cost of reaching informed agreement without hiding the remaining trust.
+
+### Public is not legible
+
+Source code, bytecode, state, and transaction history may all be public while
+their consequences remain inaccessible to ordinary users. Agents can surface
+claims, material terms, dependency powers, failure paths, and unsupported
+assumptions. That explanation is useful only while every conclusion stays
+connected to inspectable evidence; fluent reassurance is not verification.
+
+### The agreement is fragmented
+
+Source lives in repositories, packages in registries, deployments in explorers,
+interfaces in ABIs or IDLs, audits in reports, and operational control in
+multisigs or upgrade authorities. A user cannot shop confidently until these
+pieces resolve to one versioned package. Project reputation must never silently
+cover a different deployment, dependency set, or upgrade.
+
+### Trust has a cold start
+
+New contract packages lack operating history, while established packages can
+make direct inspection unnecessary for low-stakes users. Popularity is valid
+social evidence, but not proof of correctness. Useful signals attach to an
+exact version and remain separate:
+
+- unique funded counterparties and repeat use;
+- time in operation and economic value exposed;
+- independent evidence replays and evaluator diversity;
+- current audits and unresolved incidents; and
+- dependency, configuration, and upgrade recency.
+
+A single universal trust score would conceal these distinctions and invite
+gaming. Each agent should apply a stakes-dependent policy to the evidence
+vector. A small transaction may inherit community evidence; a consequential
+one may trigger direct replay or professional review.
+
+```text
+convenience             agent explanation        independent verification
+social evidence    →    claims and risks     →    selective graph replay
+low stakes              medium stakes             high stakes
+```
+
+### Reuse must change the economics
+
+The system is valuable only if it lowers recurring transaction costs. Human
+experts may author and review a reusable contract, its entitlement rules, and
+its failure paths once. Subsequent parties should verify only their parameters,
+wallets, changed dependencies, and final package digest. Legal or professional
+help can then concentrate on identity, consent, jurisdiction, or novel terms
+rather than repeatedly reconstructing deterministic behavior.
+
+### Some boundaries remain external
+
+A wallet signature proves key control, not legal identity, capacity, or freedom
+from coercion. Some jurisdictions require recognized formalities or remedies.
+External observations also need authenticated publication and explicit
+missing-data behavior. Verifiable agreements can eliminate contract-aware
+discretion after signing; they cannot make every social or legal fact
+endogenous to a chain.
+
+### Agreement UX is still consequential
+
+Both parties must understand that they are signing the same package, see the
+terms their agents consider material, and retain safe control of their wallets.
+Version hashes and evidence graphs are insufficient if the signing interface
+encourages blind approval or obscures irreversible outcomes.
+
 ## Binder's role
 
 Binder is the claim and evidence layer, not the marketplace, wallet, chain,
