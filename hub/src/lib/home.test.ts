@@ -11,4 +11,15 @@ describe("home page framing", () => {
     expect(page).toContain("See what belongs in the binder");
     expect(page).toContain("Five public case studies");
   });
+
+  it("uses direct case-study headings without label repetition", async () => {
+    const page = await readFile(new URL("../pages/cases/[id]/index.astro", import.meta.url), "utf8");
+
+    expect(page).toContain("<h2>Situation</h2>");
+    expect(page).toContain("<h2>Response</h2>");
+    expect(page).not.toContain("The situation");
+    expect(page).not.toContain("What happened");
+    expect(page).not.toContain("The turning point");
+    expect(page).not.toContain("What changed");
+  });
 });

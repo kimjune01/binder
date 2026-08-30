@@ -30,13 +30,11 @@ const artifactById = new Map(item.artifacts.map((artifact) => [artifact.id, arti
 
     <div id="current" class="tab-panel" role="tabpanel" aria-labelledby="tab-current">
       <section>
-        <p class="section-label">The situation</p>
-        <h2>What happened</h2>
+        <h2>Situation</h2>
         <p><InlineText text={item.case_study.situation} /></p>
       </section>
       <section>
-        <p class="section-label">The turning point</p>
-        <h2>What changed</h2>
+        <h2>Response</h2>
         <p><InlineText text={item.case_study.turning_point} /></p>
       </section>
       <aside class="claim-box" aria-labelledby="claim-heading">
@@ -45,14 +43,12 @@ const artifactById = new Map(item.artifacts.map((artifact) => [artifact.id, arti
         <p><InlineText text={item.claim} /></p>
       </aside>
       <section class="verdict">
-        <p class="section-label">The decision</p>
-        <h2>What the evidence warrants</h2>
+        <h2>Assessment</h2>
         <p class="verdict-text">{item.decision.expected}</p>
         <p><InlineText text={item.case_study.lesson} /></p>
       </section>
       <section>
-        <p class="section-label">The boundary</p>
-        <h2>What remains unknown</h2>
+        <h2>Open questions</h2>
         <p>{item.evidence_boundary}</p>
         <ul class="unknowns">{item.missing_edges.map((gap) => <li>{gap}</li>)}</ul>
       </section>
