@@ -51,5 +51,6 @@ The [validation study](VALIDATION.md) is the gate for any further product build.
 See [ONLINE_RESEARCH.md](ONLINE_RESEARCH.md) for the firsthand complaints and incidents motivating that study.
 
 Binder's [case checklist](CHECKLIST.md) documents how the chronology becomes a
-current projection and policy-relative recommendations. The checklist is
-licensed under CC BY-SA 4.0 so others can adapt it under the same terms.
+current projection and policy-relative recommendations. Binder-authored content
+is licensed under [CC BY-SA-NS](cc-by-sa-ns.md), which adds a corresponding-source
+requirement for network-service derivatives.

@@ -67,7 +67,6 @@ visible gap + declared policy → proposed action
 
 ## License
 
-This checklist is licensed under the
-[Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/).
-You may copy and adapt it, including commercially, provided you give attribution
-and distribute adaptations under the same license.
+This checklist is licensed under [CC BY-SA-NS](cc-by-sa-ns.md): Creative
+Commons Attribution-ShareAlike 4.0 with an additional Network Services
+condition requiring corresponding source for network-service derivatives.
