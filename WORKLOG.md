@@ -26,7 +26,19 @@ signal; silence is inconclusive. Record false positives and withdrawn comments.
 
 ## Contributions
 
+### Review queue
+
+| Case | Status | Head pinned | Why selected |
+|---|---|---|---|
+| [otter-sec/anchor #4967](contributions/otter-sec-anchor-4967.md) | queued | yes | Stateful parser boundary |
+| [solana-program/token-2022 #1402](contributions/solana-program-token-2022-1402.md) | queued | yes | Confidential-supply synchronization |
+| [solana-program/token-2022 #1384](contributions/solana-program-token-2022-1384.md) | queued | yes | Recovery authority and asset preservation |
+| [Uniswap/v4-periphery #593](contributions/uniswap-v4-periphery-593.md) | queued | yes | Authenticated calldata bounds |
+| [Uniswap/v4-periphery #588](contributions/uniswap-v4-periphery-588.md) | queued | yes | Quoter/router semantic parity |
+
 ### 2026-08-30 — solana-foundation/pay #448
+
+[Full contribution record](contributions/solana-foundation-pay-448.md)
 
 - **Target:** [Add support for Token-2022 transfer instructions](https://github.com/solana-foundation/pay/pull/448); exact reviewed revision was not recorded.
 - **Claim:** the PR adds Token-2022 transfer-instruction support.

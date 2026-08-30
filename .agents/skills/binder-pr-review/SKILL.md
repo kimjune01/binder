@@ -50,6 +50,40 @@ Prefer this comment shape:
 
 > This appears to miss **[specific valid case or counterexample]**. **[Current code path]** handles **[cases]**, but **[authoritative interface or observed behavior]** also includes **[missing case]**, so **[consequence]**. A focused regression test would **[setup and expected result]**; on the current head I **[observed it fail / predict it will fail]**. Would you prefer to handle that case here or document it as out of scope?
 
+## Persist the review
+
+When working in the Binder repository, create or update
+`contributions/<owner>-<repo>-<pr>.md`. Create the record as soon as a PR enters
+the queue; do not wait for a publishable finding. Use this structure:
+
+```markdown
+# <owner>/<repo> #<number> — <title>
+
+- **Status:** queued | reviewing | draft contribution | posted | closed
+- **PR:** <url>
+- **Head reviewed:** `<full SHA>` or `not yet reviewed`
+- **Selected:** <date and reason>
+- **Time spent:** <duration or not recorded>
+
+## Claim
+## Evidence ledger
+### Observed
+### Inferred
+### Attested
+### Unknown
+## Distinguishing test
+## Potential contribution
+## Outcome
+## Regret
+## Follow-up
+```
+
+Treat the file as a living record. Pin every substantive conclusion to the
+exact head SHA. If the PR changes, preserve the old conclusion and add a dated
+recheck rather than silently rewriting history. Label proposed tests and draft
+comments as unverified until run. Link the record from `WORKLOG.md`, but keep
+that file as a compact index and aggregate outcome table.
+
 ## External-action boundary
 
 Drafting and local verification are allowed. Before posting, editing, submitting a review, pushing a branch, or otherwise acting on GitHub, show the exact proposed text and obtain explicit user approval for that action. Treat approval as specific to the shown text and target PR.
