@@ -5,6 +5,7 @@ import {
   validationResultSchema,
   chooseCondition,
 } from "./validation";
+import { tokenizeInlineCode } from "./inline-text";
 
 describe("validation task", () => {
   it("extracts numbered questions from a packet", () => {
@@ -36,5 +37,15 @@ describe("validation task", () => {
   it("assigns either experimental condition from a random draw", () => {
     expect(chooseCondition(0.2)).toBe("control");
     expect(chooseCondition(0.8)).toBe("curated");
+  });
+});
+
+describe("inline technical text", () => {
+  it("separates backtick identifiers from prose", () => {
+    expect(tokenizeInlineCode("Compare `current_period_start_ts` now.")).toEqual([
+      { kind: "text", value: "Compare " },
+      { kind: "code", value: "current_period_start_ts" },
+      { kind: "text", value: " now." },
+    ]);
   });
 });

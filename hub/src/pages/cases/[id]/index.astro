@@ -1,5 +1,6 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
+import InlineText from "../../../components/InlineText.astro";
 import { loadCases, type PublicCase } from "../../../lib/cases";
 
 export async function getStaticPaths() {
@@ -21,7 +22,7 @@ const artifactById = new Map(item.artifacts.map((artifact) => [artifact.id, arti
   </header>
 
   <main id="main-content" class="case-body">
-    <section><h2>Claim</h2><p>{item.claim}</p></section>
+    <section><h2>Claim</h2><p><InlineText text={item.claim} /></p></section>
     <section><h2>Decision</h2><p>{item.decision.question}</p><p><strong>Expected:</strong> {item.decision.expected}</p></section>
     <section><h2>Evidence boundary</h2><p>{item.evidence_boundary}</p></section>
 

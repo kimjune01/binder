@@ -1,0 +1,8 @@
+---
+import { tokenizeInlineCode } from "../lib/inline-text";
+
+interface Props { text: string }
+const { text } = Astro.props;
+---
+
+{tokenizeInlineCode(text).map((token) => token.kind === "code" ? <code>{token.value}</code> : token.value)}

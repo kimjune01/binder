@@ -49,7 +49,7 @@ li { margin: .65rem 0; }
 .edges { padding-left: 1.35rem; }
 .edges li { margin-bottom: 1rem; }
 .edges small { display: block; margin-top: .2rem; color: var(--muted); font-family: var(--sans); }
-code { font: .78em ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
+code { padding: .1em .3em; border-radius: 2px; background: var(--soft); color: #174e2f; font: .78em ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap: anywhere; }
 mark { margin-left: .4rem; padding: .14rem .36rem; border-radius: 2px; background: var(--soft); font: .62rem var(--sans); letter-spacing: .05em; text-transform: uppercase; }
 mark.sourced { background: #dcebdd; color: #174e2f; }
 mark.inferred { background: #f1e3bd; }

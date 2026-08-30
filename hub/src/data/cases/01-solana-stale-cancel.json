@@ -5,7 +5,7 @@
   "ecosystem": "Solana",
   "class": "authorization-replay",
   "summary": "A reusable PDA let a cancellation signed for one subscription incarnation act on a later subscription until the approval was bound to its period start.",
-  "claim": "A CancelSubscriptionNow approval carrying the prior subscription's current_period_start_ts is rejected after re-subscription at the same PDA.",
+  "claim": "A `CancelSubscriptionNow` approval carrying the prior subscription's `current_period_start_ts` is rejected after re-subscription at the same PDA.",
   "evidence_boundary": "The public head-side regression concerns one replay scenario in LiteSVM. It does not establish whole-program safety, deployed identity, or the required base observation.",
   "decision": {
     "question": "Does the public evidence warrant the declared base-refuted/head-stood remediation claim?",
