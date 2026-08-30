@@ -5,6 +5,9 @@ for bounty work. It is an index, not a vulnerability database. Never commit an
 unresolved vulnerability, exploit, or sensitive reproduction detail here.
 Keep private working evidence under `.binder/whitehat/`, which is gitignored.
 
+The first-success criterion is a valid private report that causes a fix, test,
+advisory, scope clarification, or named acknowledgment. Payment is optional.
+
 ## Rules
 
 1. Snapshot the live program policy before reviewing or testing.
@@ -27,15 +30,16 @@ Keep private working evidence under `.binder/whitehat/`, which is gitignored.
 
 | ID | Target | Status | Why | Authorization / friction |
 |---|---|---|---|---|
-| WH-001 | Uniswap v4 periphery and supporting contracts | first candidate | Existing repo familiarity; clear authorization, accounting, calldata, settlement, and signature boundaries | Live Cantina bounty checked 2026-08-30. Local Foundry testing only; no mainnet, public testnet, or hosted-service testing. Functional PoC required. KYC and $50 deposit required to submit. Exact scoped contract must be confirmed before work. |
-| WH-002 | Eclipse released SVM/L2 code | blocked — policy unavailable | Strong Rust/Solana fit and an official page advertises an Immunefi bounty | Official documentation prohibits public-network testing, but its linked Immunefi program page did not resolve on 2026-08-30. Do not begin until the live scope, assets, rewards, and reporting channel are available and snapshotted. |
-| WH-003 | Cosmos released stack | defer — advanced PoC burden | Source code is explicitly in scope and the program is currently funded and triaged | Live Immunefi policy checked 2026-08-30. KYC and pay-to-submit apply. All reports need code PoCs; medium and above require an external, end-to-end exploit on a local four-node network. Only tagged, actively maintained releases qualify. |
+| WH-001 | Strapi released open-source code | first candidate | TypeScript/JavaScript fit; rich authorization, plugin, upload, and API boundaries; private GitHub advisory channel with explicit reporter credit | Security policy checked 2026-08-30. Use private GitHub Security Advisories and local instances only. Confirm supported affected versions and the policy's report requirements before testing. No payout assumed. |
+| WH-002 | Uniswap v4 periphery and supporting contracts | secondary candidate | Existing repo familiarity; clear authorization, accounting, calldata, settlement, and signature boundaries | Live Cantina bounty checked 2026-08-30. Local Foundry testing only; no mainnet, public testnet, or hosted-service testing. Functional PoC required. KYC and $50 deposit required to submit, and public disclosure is usually not permitted. Exact scoped contract must be confirmed before work. |
+| WH-003 | Eclipse released SVM/L2 code | blocked — policy unavailable | Strong Rust/Solana fit and an official page advertises an Immunefi bounty | Official documentation prohibits public-network testing, but its linked Immunefi program page did not resolve on 2026-08-30. Do not begin until the live scope, assets, rewards, and reporting channel are available and snapshotted. |
+| WH-004 | Cosmos released stack | defer — advanced PoC burden | Source code is explicitly in scope and the program is currently funded and triaged | Live Immunefi policy checked 2026-08-30. KYC and pay-to-submit apply. All reports need code PoCs; medium and above require an external, end-to-end exploit on a local four-node network. Only tagged, actively maintained releases qualify. |
 
 ## Scan ledger
 
 | ID | Target revision | Security claim / hypothesis | Policy snapshot | Duplicate search | Test status | Outcome | Next action |
 |---|---|---|---|---|---|---|---|
-| — | — | — | — | — | — | — | Start WH-001 by mapping deployed, in-scope contracts to merged PRs after their latest audit. |
+| — | — | — | — | — | — | — | Start WH-001 by mapping supported Strapi releases to recent authorization and input-handling PRs. |
 
 ## Candidate gate
 
