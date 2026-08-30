@@ -1,10 +1,10 @@
 # solana-program/token-2022 #1402 — Base confidential-mint supply on its ciphertext
 
-- **Status:** queued
+- **Status:** draft contribution
 - **PR:** https://github.com/solana-program/token-2022/pull/1402
 - **Head reviewed:** `1feea7b7f8e30660e66b8ce4de2717a2ae3ec4d2`
 - **Selected:** 2026-08-30 because it claims synchronization across two representations of confidential supply.
-- **Time spent:** selection only; audit not started
+- **Time spent:** not recorded
 
 ## Claim
 
@@ -15,13 +15,21 @@ pending burns or a nonzero initialized decryptable supply.
 
 ### Observed
 
-The PR changes one helper, adds a mint/burn/apply/mint regression test, and also
-adds two audit-advisory ignores to the Makefile.
+At `1feea7b7`, `buildConfidentialMintProofPlan` now decrypts
+`confidentialSupply`, specifically so minting works after `ApplyPendingBurn`
+without a manual AES-supply re-sync
+([lines 1541-1549](https://github.com/solana-program/token-2022/blob/1feea7b7f8e30660e66b8ce4de2717a2ae3ec4d2/clients/js/src/confidentialTransferHelpers.ts#L1541-L1549)).
+The new regression exercises that exact sequence.
+
+The exported `getConfidentialMintInstructionPlan` documentation still says the
+two representations “must be in sync,” says the proof will be rejected after
+`ApplyPendingBurn`, and instructs callers to re-sync first
+([lines 1693-1698](https://github.com/solana-program/token-2022/blob/1feea7b7f8e30660e66b8ce4de2717a2ae3ec4d2/clients/js/src/confidentialTransferHelpers.ts#L1693-L1698)).
 
 ### Inferred
 
-Useful review targets include key ownership assumptions, boundary amounts, and
-whether decrypting the confidential supply is valid in every public helper path.
+The public API documentation now states the pre-fix behavior and can make users
+perform the extra update that this PR is intended to remove.
 
 ### Attested
 
@@ -31,22 +39,32 @@ proof rejection when they diverged.
 
 ### Unknown
 
-The proof construction and new regression have not been independently run. The
-necessity and scope of the unrelated audit ignores have not been verified.
+The proof regression has not been independently run. It is unknown whether the
+same stale warning appears in generated API documentation or other guides.
 
 ## Distinguishing test
 
-To determine during review: vary initialization, pending-burn state, and amount
-boundaries while asserting both proof acceptance and supply synchronization.
-Not yet run.
+Source-level distinguishing check, run by inspection: the JSDoc describes
+`AES_decrypt(decryptableSupply) + amount`, while the implementation at the same
+head constructs the proof from decrypted `confidentialSupply`. No runtime test
+is needed to establish the documentation contradiction.
 
 ## Potential contribution
 
-Not drafted.
+> The public helper docs still describe the bug this PR fixes: they say the two
+> supply representations must be synchronized, that minting after
+> `ApplyPendingBurn` is rejected, and that callers must manually re-sync first.
+> `buildConfidentialMintProofPlan` now deliberately derives from
+> `confidentialSupply`, and the new test establishes that the manual re-sync is
+> no longer required. Could we update this JSDoc so callers do not keep the
+> obsolete workaround?
+
+Draft only; not posted.
 
 ## Outcome
 
-Not reviewed.
+Actionable documentation gap found on the pinned live head; awaiting approval
+before any GitHub action.
 
 ## Regret
 
@@ -54,5 +72,4 @@ None recorded.
 
 ## Follow-up
 
-Inspect the helper's preconditions and separate review of the functional fix
-from the dependency-audit policy change.
+If approved, recheck the live head and post the documentation comment.
