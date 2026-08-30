@@ -5,35 +5,58 @@ import { loadCases } from "../lib/cases";
 const cases = await loadCases();
 ---
 
-<Layout title="Binder public cases">
+<Layout
+  title="Binder — the whole agreement in one place"
+  description="Binder puts the contract, parameters, dependencies, evidence, reviews, signatures, and deployment record into one portable package."
+>
   <nav class="site-nav" aria-label="Primary">
     <a class="wordmark" href="/">Binder</a>
-    <span>public evidence cases</span>
+    <a class="nav-link" href="#public-cases">Public cases</a>
   </nav>
 
   <header class="hero">
-    <p class="eyebrow">Five sourced investigations</p>
-    <h1>Contract claims, joined without the trust theater.</h1>
+    <p class="eyebrow">A portable record for an executable agreement</p>
+    <h1>Put the whole agreement in one place.</h1>
     <p class="lede">
-      Five consequential cases connect findings, revisions, checks, builds, and deployments while showing what remains unknown.
+      Binder puts the contract, parameters, dependencies, evidence, reviews, signatures, and deployment record into one package that both parties can inspect and take anywhere.
     </p>
+    <div class="binder-contents" aria-label="Contents of an agreement binder">
+      <span>Contract</span>
+      <span>Terms</span>
+      <span>Evidence</span>
+      <span>Reviews</span>
+      <span>Signatures</span>
+      <span>Record</span>
+    </div>
   </header>
 
-  <main id="main-content" class="case-list">
-    {cases.map((item, index) => (
-      <article class="case-card">
-        <p class="case-number">0{index + 1}</p>
-        <div>
-          <p class="eyebrow">{item.ecosystem} · {item.class.replaceAll("-", " / ")}</p>
-          <h2><a href={`/cases/${item.id}/`}>{item.title}</a></h2>
-          <p>{item.summary}</p>
-          <p class="gap">{item.missing_edges.length} missing {item.missing_edges.length === 1 ? "edge" : "edges"}</p>
-        </div>
-      </article>
-    ))}
+  <main id="main-content">
+    <section id="public-cases" class="cases-section" aria-labelledby="cases-heading">
+      <div class="section-intro">
+        <p class="eyebrow">Five public case studies</p>
+        <h2 id="cases-heading">See what belongs in the binder</h2>
+        <p>
+          These sourced investigations show how findings, code changes, checks, builds, and deployments fit together—and make the missing documents visible.
+        </p>
+      </div>
+
+      <div class="case-list">
+        {cases.map((item, index) => (
+          <article class="case-card">
+            <p class="case-number">0{index + 1}</p>
+            <div>
+              <p class="eyebrow">{item.ecosystem} · {item.class.replaceAll("-", " / ")}</p>
+              <h3><a href={`/cases/${item.id}/`}>{item.title}</a></h3>
+              <p>{item.summary}</p>
+              <p class="gap">{item.missing_edges.length} missing {item.missing_edges.length === 1 ? "document" : "documents"}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   </main>
 
   <footer>
-    Public facts link to canonical sources. Inferences and gaps remain visibly labeled. This is a research artifact, not a safety registry.
+    Binder assembles the record. Wallets, auditors, explorers, deployment tools, and other services remain independent and linked at the point of need.
   </footer>
 </Layout>
