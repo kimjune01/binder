@@ -1,7 +1,8 @@
 # strapi/strapi #26619 — Include the Content API prefix in generated paths
 
-- **Status:** drafted — not posted
+- **Status:** posted — awaiting response
 - **PR:** https://github.com/strapi/strapi/pull/26619
+- **Comment:** https://github.com/strapi/strapi/pull/26619#issuecomment-5470622152
 - **Head reviewed:** `5b6ca3db4949d96c083f43c47ed8bd74e6df2a7f`
 - **Selected:** 2026-08-30 because generated OpenAPI paths should exactly match runtime routing under every supported REST prefix.
 - **Time spent:** not recorded
@@ -59,10 +60,12 @@ implementation fails by direct evaluation of its normalization and join logic.
 > case to the custom-prefix test? That would preserve the PR's no-double-prefix
 > guarantee for both `/api` and `/api/` configurations.
 
+Posted unchanged on 2026-08-30 after confirming that the PR remained open and
+its live head still matched the pinned revision.
+
 ## Outcome
 
-Actionable edge case validated against the pinned head; comment awaiting user
-approval.
+Actionable edge case validated and posted; awaiting maintainer response.
 
 ## Regret
 
@@ -70,5 +73,4 @@ None recorded.
 
 ## Follow-up
 
-Recheck the live head, post the comment if unchanged, and watch for a test or
-normalization change.
+Watch for a test, normalization change, scope clarification, or rejection.

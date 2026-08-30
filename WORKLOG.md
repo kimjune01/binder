@@ -35,7 +35,7 @@ signal; silence is inconclusive. Record false positives and withdrawn comments.
 | [solana-program/token-2022 #1384](contributions/solana-program-token-2022-1384.md) | posted — awaiting response | yes | Closed owner ATA prerequisite |
 | [Uniswap/v4-periphery #593](contributions/uniswap-v4-periphery-593.md) | reviewed — no useful comment | yes | Authenticated calldata bounds |
 | [Uniswap/v4-periphery #588](contributions/uniswap-v4-periphery-588.md) | reviewed — no useful comment | yes | Quoter/router semantic parity |
-| [strapi/strapi #26619](contributions/strapi-openapi-26619.md) | drafted — trailing-slash counterexample | yes | Generated/runtime route-prefix parity |
+| [strapi/strapi #26619](contributions/strapi-openapi-26619.md) | posted — awaiting response | yes | Generated/runtime route-prefix parity |
 
 ### 2026-08-30 — solana-foundation/pay #448
 
