@@ -65,7 +65,7 @@ if (questions.length !== 5) throw new Error(`Expected five validation questions 
     <section data-complete aria-live="polite" hidden>
       <h2>Result exported</h2>
       <p>Your review is complete. Keep <code data-result-filename></code>; it contains the assigned condition and elapsed time.</p>
-      <p class="completion-actions"><button type="button" data-download-again>Download result again</button><a href={`/cases/${item.id}/answer-key.md`} target="_blank" rel="noopener">Compare with answer key <span aria-hidden="true">↗</span></a></p>
+      <p class="completion-actions"><button class="secondary-button" type="button" data-download-again>Download result again</button><a href={`/cases/${item.id}/answer-key.md`} target="_blank" rel="noopener">Compare with answer key <span aria-hidden="true">↗</span></a></p>
     </section>
   </main>
 

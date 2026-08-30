@@ -94,6 +94,8 @@ details .artifacts, details .packet-grid { margin: 4px 0 22px; }
 footer { margin-top: 70px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: .76rem; }
 .packet-button, button { display: inline-flex; min-height: 48px; align-items: center; padding: .68rem .9rem; border: 0; border-bottom: 2px solid var(--ink); border-radius: 0; background: transparent; color: var(--ink); font: 600 .82rem/1.2 var(--sans); text-decoration: none; cursor: pointer; }
 .packet-button:hover, button:hover { border-color: var(--muted); color: var(--muted); }
+.secondary-button { border-bottom: 0; border-radius: 3px; background: var(--soft); font-weight: 500; }
+.secondary-button:hover { background: #e4e2dc; color: var(--ink); }
 .validation section { padding-bottom: 38px; }
 .task-progress { display: grid; grid-template-columns: repeat(3, 1fr); margin: 0 0 32px; padding: 0; list-style: none; font: .72rem var(--sans); color: var(--muted); }
 .task-progress li { margin: 0; padding: 8px 0; border-bottom: 1px solid var(--line); }
