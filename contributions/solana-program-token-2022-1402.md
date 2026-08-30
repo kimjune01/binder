@@ -1,7 +1,8 @@
 # solana-program/token-2022 #1402 — Base confidential-mint supply on its ciphertext
 
-- **Status:** validated draft contribution
+- **Status:** posted — awaiting response
 - **PR:** https://github.com/solana-program/token-2022/pull/1402
+- **Comment:** https://github.com/solana-program/token-2022/pull/1402#issuecomment-5470393663
 - **Head reviewed:** `1feea7b7f8e30660e66b8ce4de2717a2ae3ec4d2`
 - **Selected:** 2026-08-30 because it claims synchronization across two representations of confidential supply.
 - **Time spent:** not recorded
@@ -60,12 +61,11 @@ contradiction.
 >
 > The obsolete warning and workaround should be removed from the JSDoc.
 
-Draft only; not posted.
+Posted unchanged on 2026-08-30 after rechecking the live head.
 
 ## Outcome
 
-Actionable documentation gap validated on the pinned live head; awaiting
-approval before any GitHub action.
+Actionable documentation gap validated and posted; awaiting maintainer response.
 
 ## Regret
 
@@ -73,4 +73,4 @@ None recorded.
 
 ## Follow-up
 
-If approved, recheck the live head and post the documentation comment.
+Watch for a documentation change, scope clarification, or rejection.

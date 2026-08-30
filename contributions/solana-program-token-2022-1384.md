@@ -1,7 +1,8 @@
 # solana-program/token-2022 #1384 — Recover nested associated token accounts
 
-- **Status:** validated draft contribution
+- **Status:** posted — awaiting response
 - **PR:** https://github.com/solana-program/token-2022/pull/1384
+- **Comment:** https://github.com/solana-program/token-2022/pull/1384#issuecomment-5470393655
 - **Head reviewed:** `dde896ae150059d64dbf15c360f82f77bf2c6ae3`
 - **Selected:** 2026-08-30 because account recovery has explicit authority, derivation, and asset-preservation invariants.
 - **Time spent:** not recorded
@@ -70,12 +71,12 @@ the pinned SHA.
 > The closed-account setup should be covered by the test. The required ATA(s)
 > should either be recreated by the command or documented as a prerequisite.
 
-Draft only; not posted.
+Posted unchanged on 2026-08-30 after rechecking the live head.
 
 ## Outcome
 
-Actionable gap reproduced on a local validator at the pinned live head; awaiting
-approval before any GitHub action.
+Actionable gap reproduced on a local validator and posted; awaiting maintainer
+response.
 
 ## Regret
 
@@ -83,4 +84,4 @@ None recorded.
 
 ## Follow-up
 
-If approved, recheck the live head and post the validated contribution.
+Watch for a command or test change, scope clarification, or rejection.
