@@ -361,6 +361,27 @@ claim evidence reaches the deployed subject
 
 Program metadata and explorers are later discovery interfaces. They should consume Binder receipts only after repositories produce useful ones.
 
+### Decision policy: attributed, never presumed
+
+Evidence does not contain its own action threshold. Teams may publish fragments
+of that threshold in audit scopes, security policies, repository rules, release
+checklists, governance procedures, deployment controls, and records of accepted
+risk. Binder may extract and join those fragments, but it must preserve their
+authority and incompleteness.
+
+Every action-oriented result must distinguish:
+
+- **declared policy:** an authoritative rule supplied or adopted by the team;
+- **proposed policy:** a structured rule awaiting an authorized person's assent;
+- **observed practice:** a reversible inference from earlier decisions; and
+- **no policy supplied:** evidence can be evaluated, but Binder cannot recommend
+  an action.
+
+`WARRANTED` is therefore always policy-relative. When no declared policy covers
+the result, Binder should report which conditions stand and which remain
+unsupported, then return the decision to the authorized human. It must not
+silently infer `APPROVE` from green evidence or from another team's practice.
+
 ### Interfaces to avoid initially
 
 - **SARIF:** it is finding- and source-location-oriented, while Binder tracks standing semantic claims.
@@ -485,7 +506,35 @@ Before expanding beyond the local workflow:
 - At least two teams keep Binder enabled through a second real change.
 - The receiver can replay at least 80% of pilot claims in a clean environment without private help.
 
-The primary metric is **consequential changes reviewed with current, independently checkable claims**. Receipt count, checks executed, and dashboard traffic are not measures of product value.
+The primary metric is **consequential decisions materially informed by current,
+independently checkable claims**: a reviewer approves, narrows, delays, rejects,
+or requests evidence for a reason Binder made explicit. Receipt count, checks
+executed, praise, and dashboard traffic are not measures of product value.
+
+## Initial delivery model
+
+Binder must earn its larger thesis through work somebody needs today. The first
+offer is a rigorous incremental review of one consequential contract change:
+
+> Which previously supported claims remain current, which became stale, and
+> what can another engineer independently replay before deployment?
+
+Initially, Binder's operator may do the epistemic authoring manually: recover
+the claim from an audit finding or specification, identify the relevant roots,
+encode the entitlement edge, and produce the review artifact. A maintainer
+should not have to adopt a manifest-writing practice before experiencing the
+result. Repeated manual work determines what Core should automate.
+
+This can begin as a review service supported by Binder Core. The product signal
+is a repository or auditor paying for, supplying, or retaining the workflow on
+a second real change. If maintainers value the artifact but will not retain it,
+test auditors performing remediation and incremental review as the buyer. If
+neither does, do not justify horizontal expansion with expected future growth
+in agent-produced software.
+
+Cheap code and evidence generation may eventually make disciplined receiving
+agents broadly necessary. That is strategic direction, not evidence of present
+demand.
 
 ## Positioning
 
@@ -496,6 +545,12 @@ Use:
 For smart contracts:
 
 > Binder carries intent across the smart-contract toolchain: from an authored claim, through checks and witnesses, to the exact revision and artifact under review.
+
+For the initial review:
+
+> Ordinary CI says a check passed. Binder shows which exact claim the result
+> supports, where that judgment came from, what it does not establish, and what
+> would make it stale.
 
 Short form:
 

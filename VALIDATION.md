@@ -26,6 +26,8 @@ The hypothesis is:
 3. Does freshness information prevent reliance on evidence for the wrong revision or artifact?
 4. Is the improvement large enough to justify authoring and maintaining a claim?
 5. Which information changes the merge or release decision?
+6. Which parts of the decision policy are actually published, who may supply
+   the missing parts, and which thresholds exist only as tacit practice?
 
 ## Method
 
@@ -105,6 +107,8 @@ Do not lead them toward the seeded problem. Record the decision, confidence, ela
 - What did you still reconstruct manually?
 - Would you require this on the next similar change?
 - Who should author and maintain the claim?
+- Which published rule, if any, turns this evidence into permission to merge or
+  deploy?
 
 ### Commitment — 5 minutes
 
@@ -141,6 +145,11 @@ Proceed to `binder init`, binaries, and the GitHub Action only if:
 - median claim setup is under 15 active minutes when a suitable test already exists;
 - at least two teams provide an upcoming real change and keep Binder enabled for a second change; and
 - no repeated misunderstanding causes reviewers to treat `WARRANTED` as whole-program safety.
+
+For pilots without a declared decision policy, do not score Binder's action
+recommendation. Score whether it accurately exposes the missing policy and
+helps the authorized reviewer make or articulate the decision. Binder must not
+invent a team policy to make the study outcome appear more decisive.
 
 If comprehension improves but decisions do not, improve the report before building distribution. If decisions improve but authoring is too costly, build `binder init`. If nobody commits a real change, stop: the problem may be interesting but not urgent.
 
