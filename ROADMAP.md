@@ -270,6 +270,11 @@ dependencies, evidence, builds, deployments, initialization, and limitations.
 - Define immutable versions and mutable development channels.
 - Provide CLI/API operations for search, inspect, dependency traversal,
   verification, comparison, download, and fork.
+- Separate immutable implementation versions from typed parameter schemas so
+  ordinary agreement formation does not require a code fork.
+- Export a self-contained package containing source, artifact, ABI or IDL,
+  parameters, dependency lockfile, build recipe, evidence, attestations, and a
+  signing manifest.
 - Record supported chains, interfaces, dependency constraints, governance,
   upgrades, licenses, and portability notes.
 - Explicitly identify which semantic claims travel across a fork or port and
@@ -282,6 +287,36 @@ target-specific evidence is correctly invalidated and regenerated, with a
 measurable reduction in re-review work.
 
 Without demonstrated reuse, keep claims revision-specific and defer packages.
+
+## Phase 5B — validate the human agreement interface
+
+### Outcome
+
+Two parties can shop, parameterize, independently review, export, and sign the
+same package without Binder taking custody or becoming a runtime dependency.
+
+### Work
+
+- Render obligations, entitlements, loss conditions, external powers, missing
+  evidence, and code changes as human decisions rather than graph operations.
+- Give each party an independent agent-readable review path.
+- Bind both signatures to the exact implementation, parameters, chain, parties,
+  expiry, and activation conditions.
+- Keep deployment external and verify its resulting artifact identity.
+- Treat any implementation change as a fork whose affected evidence must be
+  regenerated; do not present it as parameterization.
+
+### Exit gate
+
+- Two independent pairs reach the same signed package without author help.
+- Each participant can accurately state their obligations, entitlements, and
+  principal loss conditions before signing.
+- Export, rebuild, and deployment work without a Binder account or service.
+- No pilot requires Binder custody, underwriting, legal judgment, or runtime
+  adjudication.
+
+If people value inspection but do not proceed to a shared package, retain Core
+and do not build signing or deployment orchestration.
 
 ## Phase 6 — community and market surfaces
 

@@ -13,6 +13,12 @@ The original, deeper demonstrator compares a deliberately broken Solana vault re
 See [PRODUCT.md](PRODUCT.md) for the canonical product framing and scope, and
 [VISION.md](VISION.md) for the longer-term vision of independently verified
 agreements.
+
+The boundary is deliberate: **Binder Core** is the portable epistemic CLI and
+receipt format; a later **Binder Agreements** interface may help parties shop,
+parameterize, independently review, export, and sign an exact contract package.
+Binder does not need to custody funds, choose terms, underwrite risk, adjudicate
+outcomes, or participate at runtime.
 See [OUTREACH.md](OUTREACH.md) for the soft-discovery and demo conversations
 used to test the product with contract maintainers and auditors.
 The [five-case public research hub](hub/README.md) organizes real audit,

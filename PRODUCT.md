@@ -241,9 +241,30 @@ deployment protection + verified build
   later connect the claim to what ships
 ```
 
-### Native interface: an agent-first CLI
+### Two product surfaces, one epistemic kernel
 
-The CLI is Binder's product interface. Agents already know how to invoke commands, provide files and revisions, inspect exit codes, and pass structured output to the next tool. GitHub Actions, editor integrations, MCP tools, and hosted services should be thin adapters over the same CLI contract rather than independent implementations of Binder semantics.
+Binder's durable kernel is domain-neutral: it records claims, entitlement
+edges, roots, checks, witnesses, attestations, freshness, and receipts. It
+answers what is claimed, what supports it, what could defeat it, and what
+currently stands. It does not decide whether an agreement is fair, legal, or
+desirable.
+
+That kernel can support two distinct surfaces:
+
+- **Binder Core** is the current product: an agent-first CLI and portable data
+  format for building, inspecting, and replaying evidence.
+- **Binder Agreements** is a later human-facing application: parties shop for
+  an established contract, parameterize it, review it independently, export
+  the complete package, and sign the exact package they accept.
+
+The agreement interface should present human decisions, obligations,
+entitlements, failure paths, and changes. It should not expose an evidence
+graph editor. Its output is a normal Binder package that either party can take
+elsewhere; Binder is not required at runtime.
+
+### Native Core interface: an agent-first CLI
+
+The CLI is Binder Core's product interface. Agents already know how to invoke commands, provide files and revisions, inspect exit codes, and pass structured output to the next tool. GitHub Actions, editor integrations, MCP tools, hosted services, and a later agreement interface should be thin adapters over the same Core contract rather than independent implementations of Binder semantics.
 
 Agent-friendly means:
 
@@ -381,6 +402,12 @@ Program metadata and explorers are later discovery interfaces. They should consu
 - Social identity, reputation, staking, or governance mechanisms.
 
 These exclusions preserve the falsifiable wedge: if evidence-carrying changes do not improve real review decisions, broader infrastructure has no product foundation.
+
+They do not exclude a later human agreement product. They establish its
+boundary: Binder may help parties inspect choices and bind them to a portable
+artifact, but it does not take custody, underwrite risk, supply legal advice,
+choose consequential terms for either party, adjudicate subjective outcomes,
+or become a required participant in execution.
 
 ## Relationship to verifiable knowledge
 

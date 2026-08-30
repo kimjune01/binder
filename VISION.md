@@ -2,20 +2,25 @@
 
 ## Vision
 
-Two people who want to transact should be able to shop for a contract, ask
-independent agents to evaluate it and its dependencies, agree on one exact
-package, sign it with their wallets, and enter an agreement that needs no
-contract-aware third party after activation.
+Two people who want to transact should be able to shop for an established
+contract, parameterize it without changing its implementation, ask independent
+agents to evaluate it and its dependencies, export one exact package, sign it
+with their wallets, and enter an agreement that needs neither Binder nor
+another contract-aware third party after activation.
 
 ```text
-contract marketplace
+contract catalog
         ↓
-candidate contract package
+versioned template + parameter schema
+        ↓
+party-specific parameters
         ↓
 party A's agent       party B's agent
 independently checks  independently checks
         \              /
          same rooted package
+                 ↓
+       export complete package
                  ↓
        both wallets sign its digest
                  ↓
@@ -27,6 +32,60 @@ claims matter, which future observations are admissible, and what those
 observations entitle the contract to do. Binder preserves those entitlement
 edges and lets each agent populate the surrounding evidence graph on demand.
 
+## Product boundary
+
+Binder has two layers with different audiences:
+
+- **Binder Core** is the epistemic tool: a CLI, portable format, and verifier
+  for claims, roots, entitlement edges, checks, witnesses, and receipts.
+- **Binder Agreements** is the human interface: shop, parameterize, review,
+  export, sign, and follow an agreement assembled on Core.
+
+Core is not specific to contracts. Agreements should not ask humans to operate
+a knowledge graph. It turns the graph into decisions they can understand:
+what each party must do, what each may receive, how funds can move, what can
+change the outcome, and what remains unsupported.
+
+Binder records and reproduces the parties' choices. It does not choose material
+terms for them, judge whether the bargain is fair, provide legal advice, take
+custody, underwrite either side, or adjudicate subjective outcomes. Wallets,
+chains, external evidence sources, and any dispute mechanism remain separate.
+Binder need not participate after signing.
+
+```text
+Binder establishes                 Binder does not establish
+who accepted which exact package  whether the bargain is wise or fair
+how the artifact was built        legality in every jurisdiction
+which disclosed checks passed     absence of undiscovered defects
+what can trigger each entitlement truth of unsupported external facts
+what changed and who accepted it  custody, underwriting, or adjudication
+```
+
+## Agreement workflow
+
+The human-facing path is deliberately linear:
+
+1. **Shop:** choose a versioned template with its interface, dependencies,
+   operating history, evidence, audits, and known limitations.
+2. **Parameterize:** fill the parties, assets, amounts, deadlines, evidence
+   sources, thresholds, exits, and dispute path without changing code when
+   possible.
+3. **Review independently:** each party's agent explains obligations,
+   entitlements, loss conditions, external powers, and every departure from the
+   reviewed template.
+4. **Build and verify:** reproduce the artifact, run declared checks, and bind
+   the parameters to an exact digest.
+5. **Export:** produce a self-contained package that can be inspected,
+   deployed, or archived without a Binder service.
+6. **Sign:** each wallet signs the same manifest, including chain, parties,
+   parameters, artifact digest, expiry, and activation conditions.
+7. **Deploy or enter:** a party or independent service activates the package;
+   the resulting address and artifact identity become new evidence.
+
+Parameterization and modification are different trust events. Parameterization
+instantiates a reviewed interface. A code change creates a fork and visibly
+invalidates any evidence that depended on the unchanged implementation.
+
 ## The contract package
 
 The unit of agreement is more than deployed code. It is a content-addressed
@@ -36,11 +95,17 @@ package containing:
 - exact dependencies and upgrade rules;
 - participant wallet addresses and chain identity;
 - business parameters and initial state;
+- a parameter schema separating allowed configuration from code changes;
 - allowed transitions, deadlines, defaults, and exit paths;
 - behavioral claims and their authored entitlement rules;
 - admissible external observation schemas and authenticity requirements;
 - current evidence receipts and known guarantee boundaries; and
 - the deterministic deployment or activation procedure.
+
+The export should include source, executable artifact, ABI or IDL, parameters,
+dependency lockfile, build recipe, evidence graph, receipts, attestations, and
+signing manifest. No proprietary Binder reference may be necessary to inspect,
+rebuild, deploy, or execute it.
 
 Both parties sign the same package digest. A signature proves control of the
 named wallet; any claim about the legal or social identity behind that wallet
@@ -173,7 +238,7 @@ warrant a different port.
 
 ## The shopping experience
 
-A credible contract marketplace should let an agent answer:
+A credible contract catalog should let an agent answer:
 
 - What does this contract claim to do?
 - Which exact code and dependencies would we enter?
@@ -262,8 +327,9 @@ encourages blind approval or obscures irreversible outcomes.
 
 ## Binder's role
 
-Binder is the claim and evidence layer, not the marketplace, wallet, chain,
-oracle, identity provider, or contract runtime.
+Binder is the claim and evidence layer plus an optional agreement-formation
+interface. It is not the wallet, custodian, underwriter, chain, oracle, identity
+provider, adjudicator, legal adviser, or contract runtime.
 
 Its long-term responsibility is to preserve the path:
 
