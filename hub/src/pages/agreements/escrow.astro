@@ -2,14 +2,14 @@
 import Layout from "../../layouts/Layout.astro";
 ---
 
-<Layout title="Assemble an escrow — Binder" description="Parameterize, review, and export a portable Binder package for the demo escrow contract.">
+<Layout title="Assemble a 2-of-2 Safe — Binder" description="Parameterize, review, and export a portable Binder package grounded in the released Safe Smart Account contract.">
   <nav><a href="/">← Binder</a><span>Agreement prototype</span></nav>
 
   <header class="hero case-hero agreement-hero">
     <p class="eyebrow">Working package demo</p>
-    <h1>Assemble a two-party escrow</h1>
-    <p class="lede">Fill in the agreement, inspect the same contract from both sides, then export the exact package for independent signing and deployment.</p>
-    <p class="prototype-note">This prototype uses Binder's minimal escrow kernel. It assembles a package; it does not move funds.</p>
+    <h1>Assemble a two-party Safe</h1>
+    <p class="lede">Configure a real 2-of-2 Safe Smart Account, inspect the same proposed transfer from both sides, then export the exact package for independent signing and deployment.</p>
+    <p class="prototype-note">This uses the released Safe Smart Account 1.4.1 contracts on Sepolia. A 2-of-2 Safe is shared custody—not a commercial escrow with delivery, refund, or adjudication logic.</p>
   </header>
 
   <main id="main-content" class="agreement-builder">
@@ -18,14 +18,14 @@ import Layout from "../../layouts/Layout.astro";
         <p class="section-label">1 · Parameterize</p>
         <h2 id="terms-heading">Agreement terms</h2>
         <div class="field-grid">
-          <label>Buyer wallet<input name="buyer" value="buyer.demo" required /></label>
-          <label>Recipient wallet<input name="recipient" value="recipient.demo" required /></label>
-          <label>Amount<input name="amount" type="number" min="1" value="100" required /></label>
-          <label>Asset<input name="asset" value="USDC" required /></label>
+          <label>Buyer / owner 1<input name="buyer" value="0x1111111111111111111111111111111111111111" pattern="0x[a-fA-F0-9]{40}" required /></label>
+          <label>Recipient / owner 2<input name="recipient" value="0x2222222222222222222222222222222222222222" pattern="0x[a-fA-F0-9]{40}" required /></label>
+          <label>Proposed transfer<input name="amount" type="number" min="0.001" step="0.001" value="0.1" required /></label>
+          <label>Asset<input name="asset" value="Sepolia ETH" readonly /></label>
         </div>
         <div class="term-rule">
           <span>Release rule</span>
-          <strong>Funds move only when both parties approve.</strong>
+          <strong>Threshold 2 of 2: both owners must authorize the Safe transaction.</strong>
         </div>
       </section>
 
@@ -35,13 +35,13 @@ import Layout from "../../layouts/Layout.astro";
         <div class="review-grid">
           <article>
             <h3>Review as buyer</h3>
-            <p>Your approval is required before release. The recipient cannot release funds alone.</p>
-            <p class="review-warning">This kernel declares no refund or timeout path.</p>
+            <p>Your signature is required before this Safe can execute the proposed transfer.</p>
+            <p class="review-warning">The other owner can block every transaction indefinitely.</p>
           </article>
           <article>
             <h3>Review as recipient</h3>
-            <p>The buyer must also approve before you receive <strong data-preview="amount">100</strong> <strong data-preview="asset">USDC</strong>.</p>
-            <p class="review-warning">The contract cannot force the buyer to approve.</p>
+            <p>The buyer must also sign before the Safe can send you <strong data-preview="amount">0.1</strong> <strong data-preview="asset">Sepolia ETH</strong>.</p>
+            <p class="review-warning">Safe enforces signatures, not whether delivery or other offchain conditions were satisfied.</p>
           </article>
         </div>
       </section>
@@ -50,15 +50,16 @@ import Layout from "../../layouts/Layout.astro";
         <p class="section-label">3 · Assemble</p>
         <h2 id="package-heading">Portable package</h2>
         <dl class="package-summary">
-          <div><dt>Contract</dt><dd><code>escrow-requires-both-approvals</code></dd></div>
-          <div><dt>Implementation</dt><dd><code>demo/contract/escrow.rs</code></dd></div>
-          <div><dt>Evidence</dt><dd>Base refuted · candidate stood</dd></div>
-          <div><dt>Known gap</dt><dd>No refund, deadline, identity, chain deployment, or legal wrapper</dd></div>
+          <div><dt>Contract</dt><dd>Safe Smart Account 1.4.1 · threshold <code>2/2</code></dd></div>
+          <div><dt>Singleton</dt><dd><a href="https://sepolia.etherscan.io/address/0x41675C099F32341bf84BFc5382aF534df5C7461a#code" target="_blank" rel="noopener"><code>0x41675C099F32341bf84BFc5382aF534df5C7461a</code></a></dd></div>
+          <div><dt>Source</dt><dd><a href="https://github.com/safe-global/safe-smart-account/tree/v1.4.1" target="_blank" rel="noopener">Safe 1.4.1 source</a></dd></div>
+          <div><dt>Deployment</dt><dd><a href="https://github.com/safe-global/safe-deployments/blob/main/src/assets/v1.4.1/safe.json" target="_blank" rel="noopener">Official address, code hash, and ABI registry</a></dd></div>
+          <div><dt>Known gap</dt><dd>No delivery condition, refund, deadline, identity, funded Safe proxy, or legal wrapper</dd></div>
           <div><dt>Package digest</dt><dd><code id="package-digest">calculating…</code></dd></div>
         </dl>
         <div class="package-actions">
           <button type="submit">Export package</button>
-          <a class="packet-button secondary-button" href="/cases/solana-stale-cancel/">Inspect a sourced case</a>
+          <a class="packet-button secondary-button" href="https://app.safe.global/new-safe/create" target="_blank" rel="noopener">Continue in Safe ↗</a>
         </div>
         <p class="form-note">Binder does not sign or deploy this package. Either party can take the exported JSON to an independent wallet or deployment service.</p>
       </section>
@@ -74,17 +75,27 @@ import Layout from "../../layouts/Layout.astro";
       return {
         binder_package: "0.1-demo",
         contract: {
-          id: "escrow-requires-both-approvals",
-          implementation: "demo/contract/escrow.rs",
-          claim: "Escrow funds move only when both parties approve the release."
+          id: "safe-smart-account-1.4.1-2-of-2",
+          name: "Safe Smart Account 1.4.1",
+          source: "https://github.com/safe-global/safe-smart-account/tree/v1.4.1",
+          singleton: "0x41675C099F32341bf84BFc5382aF534df5C7461a",
+          singleton_code_hash: "0x1fe2df852ba3299d6534ef416eefa406e56ced995bca886ab7a553e6d0c5e1c4",
+          proxy_factory: "0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67",
+          deployment_registry: "https://github.com/safe-global/safe-deployments/blob/main/src/assets/v1.4.1/safe.json"
         },
         parameters: {
-          buyer: fields.get("buyer"),
-          recipient: fields.get("recipient"),
+          chain_id: 11155111,
+          owners: [fields.get("buyer"), fields.get("recipient")],
+          threshold: 2,
+          proposed_recipient: fields.get("recipient"),
           amount: Number(fields.get("amount")),
           asset: fields.get("asset")
         },
-        evidence: { observation: "stood", boundary: "minimal local Rust kernel; not a deployed chain contract" },
+        evidence: {
+          source_release: "Safe 1.4.1",
+          registered_singleton: true,
+          boundary: "The registry identifies the released singleton. This package does not establish a deployed or funded Safe proxy, audit freshness, or transaction execution."
+        },
         signatures: [],
         deployment: null
       };

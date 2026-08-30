@@ -28,10 +28,14 @@ describe("home page framing", () => {
     const demo = await readFile(new URL("../pages/agreements/escrow.astro", import.meta.url), "utf8");
 
     expect(home).toContain("/agreements/escrow/");
-    expect(demo).toContain("Assemble a two-party escrow");
+    expect(demo).toContain("Assemble a two-party Safe");
     expect(demo).toContain("Review as buyer");
     expect(demo).toContain("Review as recipient");
     expect(demo).toContain("Export package");
     expect(demo).toContain("Binder does not sign or deploy this package");
+    expect(demo).toContain("Safe Smart Account 1.4.1");
+    expect(demo).toContain("0x41675C099F32341bf84BFc5382aF534df5C7461a");
+    expect(demo).toContain("https://github.com/safe-global/safe-smart-account/tree/v1.4.1");
+    expect(demo).toContain("https://sepolia.etherscan.io/address/0x41675C099F32341bf84BFc5382aF534df5C7461a#code");
   });
 });
