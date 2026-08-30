@@ -40,6 +40,9 @@ It reconstructs the claim, looks for a counterexample or claim/test mismatch,
 and drafts a concise comment with a distinguishing test. It reports when no
 useful comment is warranted and never posts without explicit approval.
 
+Public contributions and their observed outcomes are recorded in the
+[contribution worklog](WORKLOG.md).
+
 ## Reproduce
 
 Prerequisite: [rustup](https://rustup.rs/). The replay script installs the pinned `cargo-build-sbf` version when necessary, builds both runtime artifacts before testing, runs the full workspace suite, verifies the claim twice, checks deterministic receipt bytes, and checks the recorded status.
