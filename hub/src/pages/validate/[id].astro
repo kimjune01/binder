@@ -29,11 +29,17 @@ if (questions.length !== 5) throw new Error(`Expected five validation questions 
     <p class="lede">Use only the assigned packet and any sources it links. Answer as you would during a real review.</p>
   </header>
 
-  <main class="case-body validation" data-case-id={item.id}>
+  <main id="main-content" class="case-body validation" data-case-id={item.id}>
+    <ol class="task-progress" aria-label="Task progress">
+      <li data-step="review" aria-current="step"><span>1</span> Review</li>
+      <li data-step="answer"><span>2</span> Answer</li>
+      <li data-step="export"><span>3</span> Export</li>
+    </ol>
+
     <section class="instructions">
       <h2>1. Review the assigned evidence</h2>
       <p>Your condition is assigned once in this browser. Open the packet in a new tab, then return here.</p>
-      <a class="packet-button" data-packet-link target="_blank" rel="noopener">Open assigned packet ↗</a>
+      <a class="packet-button" data-packet-link target="_blank" rel="noopener">Open assigned packet <span aria-hidden="true">↗</span><span class="visually-hidden"> in a new tab</span></a>
     </section>
 
     <form data-validation-form>
@@ -56,18 +62,21 @@ if (questions.length !== 5) throw new Error(`Expected five validation questions 
       </section>
     </form>
 
-    <section data-complete hidden>
+    <section data-complete aria-live="polite" hidden>
       <h2>Result exported</h2>
-      <p>Now compare your reasoning with the answer key. Keep the JSON file; it contains the assigned condition and elapsed time.</p>
-      <a href={`/cases/${item.id}/answer-key.md`} target="_blank">Open answer key ↗</a>
+      <p>Your review is complete. Keep <code data-result-filename></code>; it contains the assigned condition and elapsed time.</p>
+      <p class="completion-actions"><button type="button" data-download-again>Download result again</button><a href={`/cases/${item.id}/answer-key.md`} target="_blank" rel="noopener">Compare with answer key <span aria-hidden="true">↗</span></a></p>
     </section>
   </main>
 
   <script is:inline define:vars={{ caseId: item.id }}>
-    const root = document.querySelector("[data-case-id]");
     const form = document.querySelector("[data-validation-form]");
     const packetLink = document.querySelector("[data-packet-link]");
     const complete = document.querySelector("[data-complete]");
+    const answerStep = document.querySelector('[data-step="answer"]');
+    const exportStep = document.querySelector('[data-step="export"]');
+    const filenameOutput = document.querySelector("[data-result-filename]");
+    const downloadAgain = document.querySelector("[data-download-again]");
     const storageKey = `binder-validation:${caseId}`;
     const saved = JSON.parse(sessionStorage.getItem(storageKey) || "null");
     const assignment = saved || {
@@ -76,6 +85,22 @@ if (questions.length !== 5) throw new Error(`Expected five validation questions 
     };
     sessionStorage.setItem(storageKey, JSON.stringify(assignment));
     packetLink.href = `/cases/${caseId}/${assignment.condition}.md`;
+    packetLink.addEventListener("click", () => {
+      document.querySelector('[aria-current="step"]')?.removeAttribute("aria-current");
+      answerStep.setAttribute("aria-current", "step");
+    });
+
+    let resultText = "";
+    let resultFilename = "";
+    function downloadResult() {
+      const blob = new Blob([resultText], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const download = document.createElement("a");
+      download.href = url;
+      download.download = resultFilename;
+      download.click();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -93,16 +118,17 @@ if (questions.length !== 5) throw new Error(`Expected five validation questions 
         confidence: Number(values.get("confidence")),
         answers: [1, 2, 3, 4, 5].map((number) => String(values.get(`answer-${number}`)).trim()),
       };
-      const blob = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const download = document.createElement("a");
-      download.href = url;
-      download.download = `binder-validation-${caseId}-${assignment.condition}.json`;
-      download.click();
-      URL.revokeObjectURL(url);
+      resultText = JSON.stringify(result, null, 2);
+      resultFilename = `binder-validation-${caseId}-${assignment.condition}.json`;
+      downloadResult();
+      filenameOutput.textContent = resultFilename;
       form.hidden = true;
       complete.hidden = false;
-      root.scrollIntoView({ behavior: "smooth" });
+      document.querySelector('[aria-current="step"]')?.removeAttribute("aria-current");
+      exportStep.setAttribute("aria-current", "step");
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      complete.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
     });
+    downloadAgain.addEventListener("click", downloadResult);
   </script>
 </Layout>

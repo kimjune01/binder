@@ -20,7 +20,7 @@ const artifactById = new Map(item.artifacts.map((artifact) => [artifact.id, arti
     <p class="lede">{item.summary}</p>
   </header>
 
-  <main class="case-body">
+  <main id="main-content" class="case-body">
     <section><h2>Claim</h2><p>{item.claim}</p></section>
     <section><h2>Decision</h2><p>{item.decision.question}</p><p><strong>Expected:</strong> {item.decision.expected}</p></section>
     <section><h2>Evidence boundary</h2><p>{item.evidence_boundary}</p></section>
@@ -29,7 +29,7 @@ const artifactById = new Map(item.artifacts.map((artifact) => [artifact.id, arti
       <h2>Public artifacts</h2>
       <ul class="artifacts">
         {item.artifacts.map((artifact) => (
-          <li><span>{artifact.kind}</span><a href={artifact.url}>{artifact.title}</a>{artifact.revision && <code>{artifact.revision}</code>}</li>
+          <li><span>{artifact.kind}</span><a href={artifact.url} target="_blank" rel="noopener">{artifact.title}<span class="visually-hidden"> (opens in a new tab)</span></a>{artifact.revision && <code>{artifact.revision}</code>}</li>
         ))}
       </ul>
     </section>
