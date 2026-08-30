@@ -1,6 +1,6 @@
 # solana-program/token-2022 #1384 — Recover nested associated token accounts
 
-- **Status:** draft contribution
+- **Status:** validated draft contribution
 - **PR:** https://github.com/solana-program/token-2022/pull/1384
 - **Head reviewed:** `dde896ae150059d64dbf15c360f82f77bf2c6ae3`
 - **Selected:** 2026-08-30 because account recovery has explicit authority, derivation, and asset-preservation invariants.
@@ -41,34 +41,39 @@ the nested account.
 
 ### Unknown
 
-The predicted failure has not been run against a validator. It remains unknown
-whether maintainers intentionally expect callers to recreate the owner and
-destination ATAs with separate CLI commands.
+It remains unknown whether maintainers intentionally expect callers to recreate
+the owner and destination ATAs with separate CLI commands.
 
 ## Distinguishing test
 
-Proposed, not run: create the owner ATA and nested ATA, fund the nested ATA,
-close the now-empty owner ATA, then invoke `spl-token recover-nested` directly.
-At the current head, predict failure before transfer because the command does
-not recreate the owner ATA. Run for both token program IDs; the `same_mint`
-variant is the smallest case.
+Run on 2026-08-30 against a local test validator from a clean checkout of the
+pinned head. The PR's integration test was modified only to close the empty
+owner ATA immediately before invoking `spl-token recover-nested`. The first
+case (`Token-2022`, distinct mints) failed before transfer with `Provided owner
+is not allowed`; the Associated Token Account program logged: “Owner associated
+token account not owned by provided token program, recreate the owner associated
+token account first.” The remaining matrix cases did not run because the first
+failure stopped the test. The PR remained open and its live head still matched
+the pinned SHA.
 
 ## Potential contribution
 
-> The motivating closed-owner-ATA case appears to be missing from the test and
-> command flow. The test leaves `owner_associated_account` live, while
-> `command_recover_nested` submits only `recover_nested`; the ATA processor
-> rejects a missing owner ATA and explicitly says to recreate it first. In the
-> `same_mint` case that account is also the destination. Could this test close
-> the owner ATA before invoking the CLI, and could the command either prepend
-> the idempotent ATA creation(s) or document the prerequisite?
+> The motivating closed-owner-ATA case is missing from the test and command
+> flow. I closed the empty `owner_associated_account` immediately before the
+> CLI invocation in this test; `recover-nested` then failed with `Provided owner
+> is not allowed`, and the ATA processor logged “recreate the owner associated
+> token account first.” `command_recover_nested` submits only `recover_nested`,
+> while the current test leaves that account live. In the `same_mint` case it is
+> also the destination. Could the test cover the closed-account setup, and could
+> the command either prepend the idempotent ATA creation(s) or document the
+> prerequisite?
 
 Draft only; not posted.
 
 ## Outcome
 
-Actionable gap found on the pinned live head; awaiting approval before any
-GitHub action.
+Actionable gap reproduced on a local validator at the pinned live head; awaiting
+approval before any GitHub action.
 
 ## Regret
 
@@ -76,4 +81,4 @@ None recorded.
 
 ## Follow-up
 
-If approved, run the closed-owner-ATA test against a validator before posting.
+If approved, recheck the live head and post the validated contribution.

@@ -31,8 +31,8 @@ signal; silence is inconclusive. Record false positives and withdrawn comments.
 | Case | Status | Head pinned | Why selected |
 |---|---|---|---|
 | [otter-sec/anchor #4967](contributions/otter-sec-anchor-4967.md) | reviewed — no useful comment | yes | Stateful parser boundary |
-| [solana-program/token-2022 #1402](contributions/solana-program-token-2022-1402.md) | draft contribution | yes | Stale public helper contract |
-| [solana-program/token-2022 #1384](contributions/solana-program-token-2022-1384.md) | draft contribution | yes | Closed owner ATA prerequisite |
+| [solana-program/token-2022 #1402](contributions/solana-program-token-2022-1402.md) | validated draft contribution | yes | Stale public helper contract |
+| [solana-program/token-2022 #1384](contributions/solana-program-token-2022-1384.md) | validated draft contribution | yes | Closed owner ATA prerequisite |
 | [Uniswap/v4-periphery #593](contributions/uniswap-v4-periphery-593.md) | reviewed — no useful comment | yes | Authenticated calldata bounds |
 | [Uniswap/v4-periphery #588](contributions/uniswap-v4-periphery-588.md) | reviewed — no useful comment | yes | Quoter/router semantic parity |
 

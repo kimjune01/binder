@@ -1,6 +1,6 @@
 # solana-program/token-2022 #1402 — Base confidential-mint supply on its ciphertext
 
-- **Status:** draft contribution
+- **Status:** validated draft contribution
 - **PR:** https://github.com/solana-program/token-2022/pull/1402
 - **Head reviewed:** `1feea7b7f8e30660e66b8ce4de2717a2ae3ec4d2`
 - **Selected:** 2026-08-30 because it claims synchronization across two representations of confidential supply.
@@ -44,10 +44,12 @@ same stale warning appears in generated API documentation or other guides.
 
 ## Distinguishing test
 
-Source-level distinguishing check, run by inspection: the JSDoc describes
-`AES_decrypt(decryptableSupply) + amount`, while the implementation at the same
-head constructs the proof from decrypted `confidentialSupply`. No runtime test
-is needed to establish the documentation contradiction.
+Source-level distinguishing check, rerun on 2026-08-30 in a clean checkout of
+the pinned head: the JSDoc describes `AES_decrypt(decryptableSupply) + amount`,
+while the implementation at the same head constructs the proof from decrypted
+`confidentialSupply`. The PR remained open and its live head still matched the
+pinned SHA. No runtime test is needed to establish the documentation
+contradiction.
 
 ## Potential contribution
 
@@ -63,8 +65,8 @@ Draft only; not posted.
 
 ## Outcome
 
-Actionable documentation gap found on the pinned live head; awaiting approval
-before any GitHub action.
+Actionable documentation gap validated on the pinned live head; awaiting
+approval before any GitHub action.
 
 ## Regret
 
