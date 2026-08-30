@@ -1,0 +1,114 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout title="Assemble an escrow — Binder" description="Parameterize, review, and export a portable Binder package for the demo escrow contract.">
+  <nav><a href="/">← Binder</a><span>Agreement prototype</span></nav>
+
+  <header class="hero case-hero agreement-hero">
+    <p class="eyebrow">Working package demo</p>
+    <h1>Assemble a two-party escrow</h1>
+    <p class="lede">Fill in the agreement, inspect the same contract from both sides, then export the exact package for independent signing and deployment.</p>
+    <p class="prototype-note">This prototype uses Binder's minimal escrow kernel. It assembles a package; it does not move funds.</p>
+  </header>
+
+  <main id="main-content" class="agreement-builder">
+    <form id="agreement-form" class="agreement-form">
+      <section aria-labelledby="terms-heading">
+        <p class="section-label">1 · Parameterize</p>
+        <h2 id="terms-heading">Agreement terms</h2>
+        <div class="field-grid">
+          <label>Buyer wallet<input name="buyer" value="buyer.demo" required /></label>
+          <label>Recipient wallet<input name="recipient" value="recipient.demo" required /></label>
+          <label>Amount<input name="amount" type="number" min="1" value="100" required /></label>
+          <label>Asset<input name="asset" value="USDC" required /></label>
+        </div>
+        <div class="term-rule">
+          <span>Release rule</span>
+          <strong>Funds move only when both parties approve.</strong>
+        </div>
+      </section>
+
+      <section aria-labelledby="review-heading">
+        <p class="section-label">2 · Review independently</p>
+        <h2 id="review-heading">What each party should notice</h2>
+        <div class="review-grid">
+          <article>
+            <h3>Review as buyer</h3>
+            <p>Your approval is required before release. The recipient cannot release funds alone.</p>
+            <p class="review-warning">This kernel declares no refund or timeout path.</p>
+          </article>
+          <article>
+            <h3>Review as recipient</h3>
+            <p>The buyer must also approve before you receive <strong data-preview="amount">100</strong> <strong data-preview="asset">USDC</strong>.</p>
+            <p class="review-warning">The contract cannot force the buyer to approve.</p>
+          </article>
+        </div>
+      </section>
+
+      <section aria-labelledby="package-heading">
+        <p class="section-label">3 · Assemble</p>
+        <h2 id="package-heading">Portable package</h2>
+        <dl class="package-summary">
+          <div><dt>Contract</dt><dd><code>escrow-requires-both-approvals</code></dd></div>
+          <div><dt>Implementation</dt><dd><code>demo/contract/escrow.rs</code></dd></div>
+          <div><dt>Evidence</dt><dd>Base refuted · candidate stood</dd></div>
+          <div><dt>Known gap</dt><dd>No refund, deadline, identity, chain deployment, or legal wrapper</dd></div>
+          <div><dt>Package digest</dt><dd><code id="package-digest">calculating…</code></dd></div>
+        </dl>
+        <div class="package-actions">
+          <button type="submit">Export package</button>
+          <a class="packet-button secondary-button" href="/cases/solana-stale-cancel/">Inspect a sourced case</a>
+        </div>
+        <p class="form-note">Binder does not sign or deploy this package. Either party can take the exported JSON to an independent wallet or deployment service.</p>
+      </section>
+    </form>
+  </main>
+
+  <script>
+    const form = document.querySelector<HTMLFormElement>("#agreement-form");
+    const digest = document.querySelector<HTMLElement>("#package-digest");
+
+    function packageData() {
+      const fields = new FormData(form!);
+      return {
+        binder_package: "0.1-demo",
+        contract: {
+          id: "escrow-requires-both-approvals",
+          implementation: "demo/contract/escrow.rs",
+          claim: "Escrow funds move only when both parties approve the release."
+        },
+        parameters: {
+          buyer: fields.get("buyer"),
+          recipient: fields.get("recipient"),
+          amount: Number(fields.get("amount")),
+          asset: fields.get("asset")
+        },
+        evidence: { observation: "stood", boundary: "minimal local Rust kernel; not a deployed chain contract" },
+        signatures: [],
+        deployment: null
+      };
+    }
+
+    async function refresh() {
+      const packet = packageData();
+      document.querySelectorAll<HTMLElement>('[data-preview="amount"]').forEach((node) => node.textContent = String(packet.parameters.amount));
+      document.querySelectorAll<HTMLElement>('[data-preview="asset"]').forEach((node) => node.textContent = String(packet.parameters.asset));
+      const bytes = new TextEncoder().encode(JSON.stringify(packet));
+      const hash = await crypto.subtle.digest("SHA-256", bytes);
+      digest!.textContent = [...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, "0")).join("").slice(0, 16) + "…";
+    }
+
+    form?.addEventListener("input", refresh);
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const blob = new Blob([JSON.stringify(packageData(), null, 2)], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "binder-escrow-package.json";
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
+    refresh();
+  </script>
+</Layout>

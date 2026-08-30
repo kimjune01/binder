@@ -22,4 +22,16 @@ describe("home page framing", () => {
     expect(page).not.toContain("The turning point");
     expect(page).not.toContain("What changed");
   });
+
+  it("offers a bounded end-to-end agreement package demo", async () => {
+    const home = await readFile(new URL("../pages/index.astro", import.meta.url), "utf8");
+    const demo = await readFile(new URL("../pages/agreements/escrow.astro", import.meta.url), "utf8");
+
+    expect(home).toContain("/agreements/escrow/");
+    expect(demo).toContain("Assemble a two-party escrow");
+    expect(demo).toContain("Review as buyer");
+    expect(demo).toContain("Review as recipient");
+    expect(demo).toContain("Export package");
+    expect(demo).toContain("Binder does not sign or deploy this package");
+  });
 });
