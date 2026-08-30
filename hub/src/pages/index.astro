@@ -6,21 +6,29 @@ const cases = await loadCases();
 ---
 
 <Layout title="Binder public cases">
+  <nav class="site-nav" aria-label="Primary">
+    <a class="wordmark" href="/">Binder</a>
+    <span>public evidence cases</span>
+  </nav>
+
   <header class="hero">
-    <p class="eyebrow">Research hub · sourced public artifacts</p>
+    <p class="eyebrow">Five sourced investigations</p>
     <h1>Contract claims, joined without the trust theater.</h1>
     <p class="lede">
       Five consequential cases connect findings, revisions, checks, builds, and deployments while showing what remains unknown.
     </p>
   </header>
 
-  <main class="case-grid">
-    {cases.map((item) => (
+  <main class="case-list">
+    {cases.map((item, index) => (
       <article class="case-card">
-        <p class="eyebrow">{item.ecosystem} · {item.class.replaceAll("-", " / ")}</p>
-        <h2><a href={`/cases/${item.id}/`}>{item.title}</a></h2>
-        <p>{item.summary}</p>
-        <p class="gap">{item.missing_edges.length} missing {item.missing_edges.length === 1 ? "edge" : "edges"}</p>
+        <p class="case-number">0{index + 1}</p>
+        <div>
+          <p class="eyebrow">{item.ecosystem} · {item.class.replaceAll("-", " / ")}</p>
+          <h2><a href={`/cases/${item.id}/`}>{item.title}</a></h2>
+          <p>{item.summary}</p>
+          <p class="gap">{item.missing_edges.length} missing {item.missing_edges.length === 1 ? "edge" : "edges"}</p>
+        </div>
       </article>
     ))}
   </main>
