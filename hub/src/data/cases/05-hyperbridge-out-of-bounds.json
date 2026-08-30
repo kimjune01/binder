@@ -29,6 +29,10 @@
     {"id":"deployment-match","relation":"deployed as","from":"audited v1.0.0 source/build","to":"current Hyperbridge verifier instances","status":"missing","citations":[]}
   ],
   "missing_edges": ["A machine-verifiable link from the audited release to each live redeployment.", "A single claim covering the additional duplicate-index and downstream composition risks would require separate evidence."],
+  "recommendations": [
+    {"action":"Verify each live verifier deployment against the audited `v1.0.0` artifact.","because":"The reviewed release cannot support a deployment claim until their identities are connected."},
+    {"action":"Track duplicate-index and downstream composition findings as separate claims.","because":"The out-of-bounds remediation does not establish broader verifier soundness."}
+  ],
   "packets": {
     "control":"hub/src/data/packets/hyperbridge-out-of-bounds/control.md",
     "curated":"hub/src/data/packets/hyperbridge-out-of-bounds/curated.md",

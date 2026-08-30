@@ -29,6 +29,10 @@
     {"id":"safe-contract","relation":"establishes safety of","from":"successful rebuild","to":"contract behavior","status":"missing","citations":[]}
   ],
   "missing_edges": ["An independently justified trust policy for the compiler/build image.", "A behavioral claim and evidence about what the reproduced contract does."],
+  "recommendations": [
+    {"action":"Declare and justify who or what may attest to the build environment.","because":"Reproducibility alone cannot show that the selected compiler or image is faithful."},
+    {"action":"Evaluate behavioral claims separately from the source-to-Wasm match.","because":"Identical bytes say nothing about whether the contract behavior is safe or intended."}
+  ],
   "packets": {
     "control":"hub/src/data/packets/stellar-reproducible-wasm/control.md",
     "curated":"hub/src/data/packets/stellar-reproducible-wasm/curated.md",

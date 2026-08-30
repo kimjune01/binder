@@ -46,6 +46,10 @@ export const publicCaseSchema = z.object({
   artifacts: z.array(artifactSchema).min(1),
   edges: z.array(edgeSchema).min(1),
   missing_edges: z.array(z.string().min(1)).min(1),
+  recommendations: z.array(z.object({
+    action: z.string().min(1),
+    because: z.string().min(1),
+  }).strict()).min(1),
   packets: z.object({
     control: z.string().min(1),
     curated: z.string().min(1),

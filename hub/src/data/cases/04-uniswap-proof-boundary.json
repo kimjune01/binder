@@ -28,6 +28,10 @@
     {"id":"arbitrary-token","relation":"applies unchanged to","from":"proof claims","to":"arbitrary token implementations","status":"missing","citations":[]}
   ],
   "missing_edges": ["A contract-level specification and proof for the fee-adjusted constant-product invariant across calls.", "A proof regenerated for token implementations that deviate from the assumed semantics."],
+  "recommendations": [
+    {"action":"Write and prove a contract-level specification for the cross-call invariant.","because":"The published single-call specifications explicitly do not establish that property."},
+    {"action":"Re-evaluate the proofs for any token outside the assumed semantics.","because":"The published result is conditional on token behavior matching the stated model."}
+  ],
   "packets": {
     "control":"hub/src/data/packets/uniswap-proof-boundary/control.md",
     "curated":"hub/src/data/packets/uniswap-proof-boundary/curated.md",
