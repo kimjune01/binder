@@ -32,6 +32,14 @@ The [five-case public research hub](hub/README.md) organizes real audit,
 verification, proof-scope, and postmortem artifacts into source-traceable case
 fixtures with explicit missing edges.
 
+## Review a pull request
+
+The repository includes a local Codex skill for turning a GitHub PR into one
+source-grounded contribution. Ask Codex to use `$binder-pr-review` with a PR URL.
+It reconstructs the claim, looks for a counterexample or claim/test mismatch,
+and drafts a concise comment with a distinguishing test. It reports when no
+useful comment is warranted and never posts without explicit approval.
+
 ## Reproduce
 
 Prerequisite: [rustup](https://rustup.rs/). The replay script installs the pinned `cargo-build-sbf` version when necessary, builds both runtime artifacts before testing, runs the full workspace suite, verifies the claim twice, checks deterministic receipt bytes, and checks the recorded status.
