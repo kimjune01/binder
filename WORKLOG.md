@@ -37,6 +37,7 @@ signal; silence is inconclusive. Record false positives and withdrawn comments.
 | [Uniswap/v4-periphery #588](contributions/uniswap-v4-periphery-588.md) | reviewed — no useful comment | yes | Quoter/router semantic parity |
 | [strapi/strapi #26619](contributions/strapi-openapi-26619.md) | posted — awaiting response | yes | Generated/runtime route-prefix parity |
 | [strapi/strapi #27088](contributions/strapi-document-id-27088.md) | posted — awaiting response | yes | Persistent document-identity integrity |
+| [Uniswap/v4-periphery #562](contributions/uniswap-v4-periphery-562.md) | posted — awaiting response | yes | Native/ERC20 settlement and refund conservation |
 
 ### 2026-08-30 — solana-foundation/pay #448
 
