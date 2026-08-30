@@ -67,8 +67,8 @@ the pinned SHA.
 > `recover_nested` instruction. In the `same_mint` case, the missing owner ATA is
 > also the destination.
 >
-> Could the test cover the closed-account setup? The command could then either
-> recreate the required ATA(s) or document the prerequisite.
+> The closed-account setup should be covered by the test. The required ATA(s)
+> should either be recreated by the command or documented as a prerequisite.
 
 Draft only; not posted.
 

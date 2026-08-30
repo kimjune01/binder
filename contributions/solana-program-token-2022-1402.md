@@ -58,7 +58,7 @@ contradiction.
 > `buildConfidentialMintProofPlan` now derives from `confidentialSupply`, and the
 > new test covers minting without a re-sync.
 >
-> Could we update the JSDoc to remove the obsolete warning and workaround?
+> The obsolete warning and workaround should be removed from the JSDoc.
 
 Draft only; not posted.
 
