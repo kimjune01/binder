@@ -49,6 +49,14 @@ the support for a bounded claim. It is not a comprehensive security audit.
 - [ ] Recommend the smallest observation, review, attestation, or identity link that could close it.
 - [ ] Label the result as a recommendation rather than a fact or universal requirement.
 
+## 8. Publish a contribution
+
+- [ ] Pin the live head again immediately before posting.
+- [ ] Link each material factual claim to exact lines at the pinned revision.
+- [ ] Link the distinguishing control, test, specification, or oracle when public.
+- [ ] Keep inference visibly separate from what the linked evidence directly shows.
+- [ ] Record the posted comment permalink and reviewed head in the worklog.
+
 ## How Binder applies it
 
 1. Append provenance events without rewriting history.

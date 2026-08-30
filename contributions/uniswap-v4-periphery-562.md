@@ -48,6 +48,8 @@ refunded. The reviewed implementation reverts on the ERC20 leg instead.
 ## Potential contribution
 
 Posted on 2026-08-30 after confirming the live head matched the pinned revision.
+The comment was then amended with pinned line links for settlement order,
+transient-value handling, the ERC20 guard, and the existing overpayment helper.
 
 ## Outcome
 
