@@ -29,8 +29,8 @@
   ],
   "missing_edges": ["A defined restricted re-audit scope for the materially changed contracts.", "Evidence that production role configuration and deployed bytecode match the reviewed system."],
   "recommendations": [
-    {"action":"Commission a restricted audit of the materially refactored contracts.","because":"The auditor explicitly warned that the fixes produced a substantially different codebase."},
-    {"action":"Record production roles and deployed bytecode against the reviewed candidate.","because":"Finding-level closure does not establish the configuration or identity of the production system."}
+    {"action":"Commission a restricted audit of the materially refactored contracts.","because":"The auditor explicitly warned that the fixes produced a substantially different codebase.","guide":"targeted-review"},
+    {"action":"Record production roles and deployed bytecode against the reviewed candidate.","because":"Finding-level closure does not establish the configuration or identity of the production system.","guide":"verify-deployment-identity"}
   ],
   "packets": {
     "control":"hub/src/data/packets/endaoment-remediation-refactor/control.md",

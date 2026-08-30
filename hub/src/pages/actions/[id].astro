@@ -1,0 +1,43 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { loadActionGuides, type ActionGuide } from "../../lib/actions";
+
+export async function getStaticPaths() {
+  return (await loadActionGuides()).map((guide) => ({ params: { id: guide.id }, props: { guide } }));
+}
+
+interface Props { guide: ActionGuide }
+const { guide } = Astro.props;
+---
+
+<Layout title={`${guide.title} — Binder action guide`} description={guide.summary}>
+  <nav><a href="/method/">← Case checklist</a><span>Action guide</span></nav>
+  <header class="hero case-hero">
+    <p class="eyebrow">Generic next action · CC BY-SA-NS</p>
+    <h1>{guide.title}</h1>
+    <p class="lede">{guide.summary}</p>
+  </header>
+
+  <main id="main-content" class="case-body action-guide">
+    <section>
+      <p class="section-label">When to use it</p>
+      <h2>The trigger</h2>
+      <p>{guide.when}</p>
+    </section>
+    <section>
+      <p class="section-label">Brief procedure</p>
+      <h2>How to do it</h2>
+      <ol class="procedure">{guide.steps.map((step) => <li>{step}</li>)}</ol>
+    </section>
+    <section>
+      <p class="section-label">Completion evidence</p>
+      <h2>What to preserve</h2>
+      <ul class="checklist">{guide.produces.map((artifact) => <li>{artifact}</li>)}</ul>
+    </section>
+    <aside class="claim-box">
+      <p class="section-label">Boundary</p>
+      <p>{guide.limits}</p>
+    </aside>
+    <p><a class="packet-button secondary-button" href="/method/">See the full Binder checklist →</a></p>
+  </main>
+</Layout>

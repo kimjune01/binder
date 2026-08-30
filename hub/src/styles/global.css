@@ -72,6 +72,9 @@ li { margin: .65rem 0; }
 .recommendations li > span { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 50%; background: var(--ink); color: var(--paper); font: .68rem var(--sans); }
 .recommendations h3 { margin: 1px 0 6px; font-size: 1rem; font-weight: 600; }
 .recommendations p { margin: 0; color: #55534e; }
+.recommendation-guide { display: inline-block; margin-top: 9px; font: 600 .75rem var(--sans); }
+.procedure { margin: 20px 0 0; padding-left: 1.4rem; }
+.procedure li { padding-left: 6px; margin: 12px 0; }
 .checklist { margin: 18px 0 0; padding: 0; list-style: none; }
 .checklist li { position: relative; padding-left: 30px; }
 .checklist li::before { content: "□"; position: absolute; left: 0; color: var(--accent); font: 1.05rem var(--sans); }

@@ -108,7 +108,7 @@ const artifactById = new Map(item.artifacts.map((artifact) => [artifact.id, arti
         <h2>What would strengthen the current claim</h2>
         <ol class="recommendations">
           {item.recommendations.map((recommendation, index) => (
-            <li><span>{index + 1}</span><div><h3><InlineText text={recommendation.action} /></h3><p>{recommendation.because}</p></div></li>
+            <li><span>{index + 1}</span><div><h3><InlineText text={recommendation.action} /></h3><p>{recommendation.because}</p><a class="recommendation-guide" href={`/actions/${recommendation.guide}/`}>How to do this →</a></div></li>
           ))}
         </ol>
         <p class="form-note">These actions are derived from the visible gaps. They are recommendations, not facts or automatic requirements.</p>

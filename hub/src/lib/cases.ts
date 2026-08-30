@@ -49,6 +49,7 @@ export const publicCaseSchema = z.object({
   recommendations: z.array(z.object({
     action: z.string().min(1),
     because: z.string().min(1),
+    guide: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   }).strict()).min(1),
   packets: z.object({
     control: z.string().min(1),

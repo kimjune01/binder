@@ -29,8 +29,8 @@
   ],
   "missing_edges": ["A preserved base witness showing that the stale approval succeeds on the audited revision.", "A source/build/deployment identity linking the reviewed remediation to a live program."],
   "recommendations": [
-    {"action":"Run and preserve the same stale-approval scenario against `d6b3a5dc`.","because":"The head-side regression is only discriminating if the affected base exhibits the behavior it claims to fix."},
-    {"action":"Link the reviewed fix to the build and live program identity.","because":"A source-level remediation does not establish which artifact users currently execute."}
+    {"action":"Run and preserve the same stale-approval scenario against `d6b3a5dc`.","because":"The head-side regression is only discriminating if the affected base exhibits the behavior it claims to fix.","guide":"reproduce-on-baseline"},
+    {"action":"Link the reviewed fix to the build and live program identity.","because":"A source-level remediation does not establish which artifact users currently execute.","guide":"verify-deployment-identity"}
   ],
   "packets": {
     "control":"hub/src/data/packets/solana-stale-cancel/control.md",

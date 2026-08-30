@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { caseClasses, loadCases } from "./cases";
+import { loadActionGuides } from "./actions";
 
 describe("public case corpus", () => {
   it("contains one valid fixture for every roadmap class", async () => {
@@ -39,6 +40,17 @@ describe("public case corpus", () => {
       expect(new Set(ids).size).toBe(ids.length);
       for (const edge of item.edges) {
         for (const citation of edge.citations) expect(ids).toContain(citation);
+      }
+    }
+  });
+
+  it("links every recommendation to a generic action guide", async () => {
+    const cases = await loadCases();
+    const guideIds = new Set((await loadActionGuides()).map((guide) => guide.id));
+
+    for (const item of cases) {
+      for (const recommendation of item.recommendations) {
+        expect(guideIds).toContain(recommendation.guide);
       }
     }
   });

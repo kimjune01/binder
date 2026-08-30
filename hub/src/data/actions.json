@@ -1,0 +1,74 @@
+[
+  {
+    "id": "reproduce-on-baseline",
+    "title": "Reproduce the observation on the baseline",
+    "summary": "Run the same scenario against the relevant earlier revision to show that the evidence distinguishes the change.",
+    "when": "Use this when a fix has a passing regression or check on the new revision, but the corresponding behavior on the affected revision was not preserved.",
+    "steps": ["Pin the affected and candidate revisions.", "Run the same inputs and verdict rule against both.", "Preserve raw output and concrete witnesses from each run.", "Record base-refuted, head-stood, or no-verdict without changing the rule after observing results."],
+    "produces": ["Exact base and head identities", "One shared observation rule", "Raw outputs and witnesses", "A discriminating or non-discriminating verdict"],
+    "limits": "This establishes only the named behavioral contrast under the recorded inputs and environment."
+  },
+  {
+    "id": "verify-deployment-identity",
+    "title": "Connect reviewed source to a live deployment",
+    "summary": "Establish that the artifact users execute was built from the source and configuration that received review.",
+    "when": "Use this whenever an audit, fix review, or source-level test is being relied upon for a deployed contract.",
+    "steps": ["Identify the reviewed source revision and build inputs.", "Reproduce or attest the resulting bytecode or Wasm digest.", "Read the artifact identity from the target chain.", "Record the exact match, mismatch, proxy implementation, and configuration identities."],
+    "produces": ["Reviewed revision", "Build recipe or attestation", "Artifact digest", "Chain and deployment address", "Match or mismatch observation"],
+    "limits": "Matching identity does not establish behavioral safety; it connects another body of evidence to the deployed artifact."
+  },
+  {
+    "id": "targeted-review",
+    "title": "Request a targeted review",
+    "summary": "Review the smallest changed scope whose behavior is no longer covered by the previous engagement.",
+    "when": "Use this after a material refactor, migration, upgrade, or remediation changes the original audit subject.",
+    "steps": ["Diff the originally reviewed scope against the production candidate.", "Identify changed trust boundaries, storage, roles, and external calls.", "Agree on a restricted scope with a qualified reviewer.", "Publish the scope, exact revisions, findings, and remediation status."],
+    "produces": ["Explicit review scope", "Base and candidate revisions", "Findings and disposition", "Declared exclusions"],
+    "limits": "A targeted review covers its declared scope, not every unchanged component or production configuration."
+  },
+  {
+    "id": "establish-build-trust",
+    "title": "Establish trust in the build environment",
+    "summary": "Declare why the compiler, image, and builder used for reproduction are acceptable for the decision at hand.",
+    "when": "Use this when bytes reproduce but the build toolchain itself could be malicious, mutable, or controlled by an unknown party.",
+    "steps": ["Pin compiler, image, dependencies, and build instructions by digest.", "Name the party or policy entitled to approve them.", "Prefer independent rebuilds or diverse toolchains where feasible.", "Record attestations and disagreements without collapsing them into one badge."],
+    "produces": ["Pinned build environment", "Trust policy", "Attributed attestations", "Independent reproduction results"],
+    "limits": "A trusted build relationship does not establish that the source behavior is desirable or safe."
+  },
+  {
+    "id": "evaluate-behavior",
+    "title": "Evaluate a behavioral claim",
+    "summary": "State what the contract should do and gather evidence that directly observes that behavior.",
+    "when": "Use this when provenance or source reproduction is being mistaken for evidence about runtime behavior.",
+    "steps": ["Write one bounded behavioral claim and its assumptions.", "Choose an observation capable of distinguishing failure from success.", "Run it against exact artifacts and preserve witnesses.", "State what paths, states, and environments remain outside the observation."],
+    "produces": ["Behavioral claim", "Verdict rule", "Executable observation", "Witnesses", "Guarantee boundary"],
+    "limits": "Tests and traces cover what they observe; formal proofs cover only their specifications and models."
+  },
+  {
+    "id": "specify-and-prove-property",
+    "title": "Specify and prove an additional property",
+    "summary": "Extend formal evidence by writing the missing property explicitly and proving it against the intended artifact and model.",
+    "when": "Use this when an existing proof is rigorous but does not include the property being cited.",
+    "steps": ["Write the property independently of the implementation.", "Declare environmental and token assumptions.", "Bind the specification to exact bytecode or source identity.", "Run the prover, preserve counterexamples, and publish exclusions."],
+    "produces": ["Formal specification", "Assumption set", "Artifact identity", "Proof or counterexample", "Tool and version"],
+    "limits": "The result cannot exceed the specification, model, tool semantics, or stated assumptions."
+  },
+  {
+    "id": "validate-assumptions",
+    "title": "Validate an evidence assumption",
+    "summary": "Check that the real component or environment satisfies an assumption on which existing evidence depends.",
+    "when": "Use this when proofs, tests, or audits assume particular token, oracle, role, compiler, or dependency behavior.",
+    "steps": ["Extract the assumption from the original evidence.", "Identify the real component occupying that role.", "Test, prove, or obtain an entitled attestation for equivalence.", "Mark the original conclusion inapplicable if the assumption does not hold."],
+    "produces": ["Named assumption", "Concrete subject", "Equivalence evidence", "Applicable or inapplicable conclusion"],
+    "limits": "Validating one assumption does not validate other assumptions or broaden the original evidence scope."
+  },
+  {
+    "id": "separate-claims",
+    "title": "Split a broad conclusion into separate claims",
+    "summary": "Give adjacent risks their own subjects, evidence, boundaries, and current states instead of inheriting another fix's status.",
+    "when": "Use this when one remediation or review is being extended to related components, exploit paths, or compositions.",
+    "steps": ["Name each distinct behavior or identity relationship.", "Assign the exact artifacts and responsible parties for each.", "Attach only evidence that directly supports that claim.", "Track unresolved claims independently in the chronology and current view."],
+    "produces": ["Independent claim records", "Claim-specific evidence", "Separate status and boundaries", "Unambiguous action owners"],
+    "limits": "Splitting claims improves legibility; it does not itself produce the missing evidence."
+  }
+]
