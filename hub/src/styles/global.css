@@ -28,6 +28,9 @@ nav { display: flex; align-items: baseline; justify-content: space-between; gap:
 nav a { color: var(--ink); }
 .wordmark { font-size: 1rem; font-weight: 650; letter-spacing: -.02em; text-decoration: none; }
 .nav-link { color: var(--muted); font-size: .78rem; text-decoration: none; }
+.nav-links { display: flex; gap: 20px; }
+.nav-links a { color: var(--muted); text-decoration: none; }
+.nav-links a:hover, .nav-links a:focus-visible, .nav-links a[aria-current="page"] { color: var(--ink); }
 .hero { padding: 18px 0 72px; }
 .case-hero { padding-top: 0; }
 .eyebrow { margin: 0 0 .55rem; color: var(--muted); font-size: .7rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
@@ -144,6 +147,15 @@ textarea:focus, input:focus { outline: 2px solid #aecab8; outline-offset: 2px; b
 .package-summary dt { color: var(--muted); font: .7rem var(--sans); }
 .package-summary dd { margin: 0; font-size: .9rem; }
 .package-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+.contract-catalog { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 34px; }
+.contract-card { padding: 24px; border: 1px solid var(--line); background: #fff; }
+.contract-card h2 { margin-top: .35rem; }
+.contract-card h2 a { text-decoration: none; }
+.contract-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; font: .65rem var(--sans); color: var(--muted); }
+.contract-meta span { padding: 4px 7px; background: var(--soft); border-radius: 2px; }
+.contract-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; font: .72rem var(--sans); }
+.receipt-list { padding: 0; list-style: none; }
+.receipt-list li { padding: 16px 0; border-top: 1px solid var(--line); }
 [hidden] { display: none !important; }
 @keyframes arrive { from { opacity: .35; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
 .page-shell { animation: arrive .15s ease-in both; }
@@ -156,6 +168,8 @@ textarea:focus, input:focus { outline: 2px solid #aecab8; outline-offset: 2px; b
   .section-intro .eyebrow { grid-column: auto; }
   .section-intro > p:last-child { margin-top: 0; }
   .field-grid, .review-grid { grid-template-columns: 1fr; }
+  .contract-catalog { grid-template-columns: 1fr; }
+  .nav-links { gap: 12px; }
   .term-rule { display: block; }
   .term-rule strong { display: block; margin-top: 8px; text-align: left; }
   .package-summary div { grid-template-columns: 1fr; gap: 4px; }

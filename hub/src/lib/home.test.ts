@@ -27,7 +27,7 @@ describe("home page framing", () => {
     const home = await readFile(new URL("../pages/index.astro", import.meta.url), "utf8");
     const demo = await readFile(new URL("../pages/agreements/escrow.astro", import.meta.url), "utf8");
 
-    expect(home).toContain("/agreements/escrow/");
+    expect(home).toContain("/agreements/");
     expect(demo).toContain("Assemble a two-party Safe");
     expect(demo).toContain("Review as buyer");
     expect(demo).toContain("Review as recipient");

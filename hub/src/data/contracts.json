@@ -1,0 +1,73 @@
+[
+  {
+    "id": "safe-2-of-2",
+    "title": "Two-party Safe",
+    "provider": "Safe",
+    "use_case": "Shared custody",
+    "summary": "Two owners configure a Safe so both signatures are required for every transaction.",
+    "status": "deployed",
+    "runtime": "EVM",
+    "deployment": { "chain": "Sepolia", "address": "0x41675C099F32341bf84BFc5382aF534df5C7461a", "explorer": "https://sepolia.etherscan.io/address/0x41675C099F32341bf84BFc5382aF534df5C7461a#code" },
+    "interface": { "name": "Safe 1.4.1", "functions": ["setup(address[],uint256,address,bytes,address,address,uint256,address)", "execTransaction(address,uint256,bytes,uint8,uint256,uint256,uint256,address,address,bytes)"] },
+    "parameters": ["owners", "threshold", "chain", "proposed transaction"],
+    "receipts": [
+      { "kind": "source", "claim": "This tag contains the reviewed Safe 1.4.1 implementation.", "url": "https://github.com/safe-global/safe-smart-account/tree/v1.4.1", "revision": "v1.4.1", "boundary": "Source identity alone does not identify a Safe proxy or its configuration." },
+      { "kind": "deployment", "claim": "Safe's registry maps the released 1.4.1 singleton to this canonical address and code hash.", "url": "https://github.com/safe-global/safe-deployments/blob/main/src/assets/v1.4.1/safe.json", "revision": "1.4.1", "boundary": "The singleton deployment is not the party-specific proxy instance." },
+      { "kind": "documentation", "claim": "Safe defines owners, threshold, transaction hashes, nonces, and signatures.", "url": "https://github.com/safe-global/safe-smart-account/blob/v1.4.1/contracts/Safe.sol", "revision": "v1.4.1", "boundary": "Documentation does not establish the economic suitability of 2-of-2 control." }
+    ],
+    "gaps": ["No deployed party-specific Safe proxy", "No funded balance", "No delivery, refund, or adjudication condition"],
+    "demo_url": "/agreements/escrow/"
+  },
+  {
+    "id": "sablier-lockup",
+    "title": "Linear payment stream",
+    "provider": "Sablier",
+    "use_case": "Vesting and payroll",
+    "summary": "A sender deposits tokens that become withdrawable by a recipient continuously over time.",
+    "status": "deployed",
+    "runtime": "Solana",
+    "deployment": { "chain": "Solana mainnet", "address": "4EauRKrNErKfsR4XetEZJNmvACGHbHnHV4R5dvJuqupC", "explorer": "https://explorer.solana.com/address/4EauRKrNErKfsR4XetEZJNmvACGHbHnHV4R5dvJuqupC" },
+    "interface": { "name": "SolSab Lockup", "functions": ["create_stream", "withdraw", "cancel"] },
+    "parameters": ["sender", "recipient", "mint", "amount", "start time", "end time", "cancellable"],
+    "receipts": [
+      { "kind": "source", "claim": "The public repository contains Sablier's Solana Lockup program source.", "url": "https://github.com/sablier-labs/solsab", "boundary": "The repository main branch may move after a deployed release." },
+      { "kind": "deployment", "claim": "Sablier publishes this address as the official Lockup deployment.", "url": "https://github.com/sablier-labs/solsab#lockup", "boundary": "The published address does not by itself prove current source-to-program identity." },
+      { "kind": "audit", "claim": "Sablier lists a Cantina review for SolSab.", "url": "https://github.com/sablier-labs/audits#solsab", "revision": "2883177", "boundary": "An audit is scoped to its reviewed revision and is not a guarantee." }
+    ],
+    "gaps": ["Deployed-program-to-audited-revision receipt not assembled", "No selected token mint or funded stream", "Cancellation rights require parameter review"]
+  },
+  {
+    "id": "openzeppelin-vesting-wallet",
+    "title": "Vesting wallet",
+    "provider": "OpenZeppelin",
+    "use_case": "Token grant",
+    "summary": "A beneficiary receives native or ERC-20 assets according to a linear schedule.",
+    "status": "source-template",
+    "runtime": "EVM",
+    "interface": { "name": "VestingWallet", "functions": ["constructor(address,uint64,uint64)", "release()", "release(address)", "vestedAmount(uint64)"] },
+    "parameters": ["beneficiary", "start timestamp", "duration", "asset", "funding amount"],
+    "receipts": [
+      { "kind": "source", "claim": "OpenZeppelin publishes the VestingWallet implementation in Contracts 5.x.", "url": "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/finance/VestingWallet.sol", "boundary": "The moving master branch is not a pinned deployment artifact." },
+      { "kind": "documentation", "claim": "The API documents linear vesting behavior and release functions.", "url": "https://docs.openzeppelin.com/contracts/5.x/api/finance#VestingWallet", "boundary": "The primitive must be deployed, configured, funded, and reviewed in its application." }
+    ],
+    "gaps": ["No canonical deployed instance", "No pinned release selected", "No beneficiary, schedule, asset, funding, or deployment receipt"]
+  },
+  {
+    "id": "uniswap-permit2",
+    "title": "Expiring token permission",
+    "provider": "Uniswap",
+    "use_case": "Bounded token authorization",
+    "summary": "A token owner gives a spender an amount- and time-bounded ERC-20 permission using Permit2.",
+    "status": "deployed",
+    "runtime": "EVM",
+    "deployment": { "chain": "Multiple EVM chains", "address": "0x000000000022D473030F116dDEE9F6B43aC78BA3", "explorer": "https://etherscan.io/address/0x000000000022D473030F116dDEE9F6B43aC78BA3#code" },
+    "interface": { "name": "Permit2", "functions": ["permit(address,PermitSingle,bytes)", "transferFrom(address,address,uint160,address)", "permitTransferFrom(PermitTransferFrom,SignatureTransferDetails,address,bytes)"] },
+    "parameters": ["owner", "token", "spender", "amount", "expiration", "nonce", "chain"],
+    "receipts": [
+      { "kind": "source", "claim": "Uniswap publishes Permit2's AllowanceTransfer and SignatureTransfer implementation.", "url": "https://github.com/Uniswap/permit2", "boundary": "Repository source does not identify the user's token approval or signed permit." },
+      { "kind": "deployment", "claim": "Uniswap deployment records identify the canonical Permit2 address.", "url": "https://github.com/Uniswap/contracts/blob/main/deployments/json/5042.json", "boundary": "One chain record does not prove availability or code identity on every named chain." },
+      { "kind": "documentation", "claim": "Permit2 supports signature-based approvals, bounded allowances, transfers, and revocation.", "url": "https://github.com/Uniswap/permit2#readme", "boundary": "The integrating spender contract and token behavior remain separate dependencies." }
+    ],
+    "gaps": ["No owner signature", "No selected token or spender", "No chain-specific bytecode receipt", "No review of the integrating spender"]
+  }
+]

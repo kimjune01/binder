@@ -1,0 +1,29 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { loadDemoContracts } from "../../lib/contracts";
+
+const contracts = await loadDemoContracts();
+---
+
+<Layout title="Demo agreements — Binder" description="Inspectable contract packages with source, deployment, audit, interface, and gap receipts.">
+  <nav class="site-nav" aria-label="Primary">
+    <a class="wordmark" href="/">Binder</a>
+    <div class="nav-links"><a aria-current="page" href="/agreements/">Agreements</a><a href="/#public-cases">Public cases</a><a href="/method/">Method</a></div>
+  </nav>
+  <header class="hero case-hero">
+    <p class="eyebrow">Four inspectable packages</p>
+    <h1>Start from a contract that already exists.</h1>
+    <p class="lede">Each package names the public interface, parameters, source, deployments, assurance receipts, and what is still missing. Agents can read the same record as JSON.</p>
+  </header>
+  <main id="main-content" class="contract-catalog">
+    {contracts.map((contract) => (
+      <article class="contract-card">
+        <div class="contract-meta"><span>{contract.provider}</span><span>{contract.runtime}</span><span>{contract.status === "deployed" ? "Deployed" : "Source template"}</span></div>
+        <p class="eyebrow">{contract.use_case}</p>
+        <h2><a href={`/agreements/${contract.id}/`}>{contract.title}</a></h2>
+        <p>{contract.summary}</p>
+        <div class="contract-actions"><a href={`/agreements/${contract.id}/`}>Inspect package →</a><a href={`/agreements/${contract.id}.json`}>Agent JSON</a>{contract.demo_url && <a href={contract.demo_url}>Configure demo</a>}</div>
+      </article>
+    ))}
+  </main>
+</Layout>

@@ -1,0 +1,26 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { loadDemoContracts, type DemoContract } from "../../lib/contracts";
+
+export async function getStaticPaths() {
+  return (await loadDemoContracts()).map((contract) => ({ params: { id: contract.id }, props: { contract } }));
+}
+interface Props { contract: DemoContract }
+const { contract } = Astro.props;
+---
+
+<Layout title={`${contract.title} — Binder`} description={contract.summary}>
+  <nav><a href="/agreements/">← Agreements</a><a href={`/agreements/${contract.id}.json`}>Agent JSON</a></nav>
+  <header class="hero case-hero">
+    <p class="eyebrow">{contract.provider} · {contract.use_case} · {contract.runtime}</p>
+    <h1>{contract.title}</h1><p class="lede">{contract.summary}</p>
+  </header>
+  <main id="main-content" class="case-body contract-detail">
+    <section><h2>Interface</h2><p><code>{contract.interface.name}</code></p><ul>{contract.interface.functions.map((fn) => <li><code>{fn}</code></li>)}</ul></section>
+    <section><h2>Parameters</h2><ul>{contract.parameters.map((parameter) => <li>{parameter}</li>)}</ul></section>
+    {contract.deployment && <section><h2>Deployment</h2><p>{contract.deployment.chain}</p><p><a href={contract.deployment.explorer} target="_blank" rel="noopener"><code>{contract.deployment.address}</code></a></p></section>}
+    <section><h2>Receipts</h2><ol class="receipt-list">{contract.receipts.map((receipt) => <li><p><mark class="sourced">{receipt.kind}</mark> <strong>{receipt.claim}</strong></p><p><a href={receipt.url} target="_blank" rel="noopener">Open canonical artifact ↗</a>{receipt.revision && <> · <code>{receipt.revision}</code></>}</p><p class="form-note">Boundary: {receipt.boundary}</p></li>)}</ol></section>
+    <section><h2>Missing from this binder</h2><ul class="unknowns">{contract.gaps.map((gap) => <li>{gap}</li>)}</ul></section>
+    <div class="package-actions"><a class="packet-button" href={`/agreements/${contract.id}.json`}>Download agent package</a>{contract.demo_url && <a class="packet-button secondary-button" href={contract.demo_url}>Configure this agreement</a>}</div>
+  </main>
+</Layout>
