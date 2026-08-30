@@ -5,6 +5,11 @@
   "ecosystem": "Solana",
   "class": "authorization-replay",
   "summary": "A reusable PDA let a cancellation signed for one subscription incarnation act on a later subscription until the approval was bound to its period start.",
+  "case_study": {
+    "situation": "Solana subscriptions reused the same program-derived address when a customer subscribed again. That made an old cancellation approval look valid against a new subscription occupying the same address.",
+    "turning_point": "The remediation bound `CancelSubscriptionNow` to `current_period_start_ts`, so an approval identifies one subscription incarnation rather than merely one reusable address.",
+    "lesson": "The new regression demonstrates the intended rejection on the fixed revision. The public record still lacks the matching base run that proves the test discriminates the remediation from the audited code."
+  },
   "claim": "A `CancelSubscriptionNow` approval carrying the prior subscription's `current_period_start_ts` is rejected after re-subscription at the same PDA.",
   "evidence_boundary": "The public head-side regression concerns one replay scenario in LiteSVM. It does not establish whole-program safety, deployed identity, or the required base observation.",
   "decision": {

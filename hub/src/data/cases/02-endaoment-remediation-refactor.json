@@ -5,6 +5,11 @@
   "ecosystem": "Ethereum",
   "class": "upgrade-migration",
   "summary": "Endaoment fixed major governance issues through a broad refactor; OpenZeppelin then warned that the resulting codebase may itself merit another restricted audit.",
+  "case_study": {
+    "situation": "OpenZeppelin's engagement found major governance restrictions that Endaoment needed to change before production. The fixes landed across two pull requests and materially reorganized the contracts.",
+    "turning_point": "The audit update accepted the reported fixes but warned that implementing them had produced a substantially different codebase from the one originally reviewed.",
+    "lesson": "A remediation review can close named findings without extending the original audit boundary over everything the remediation changed. Successful fixes may create a new review subject."
+  },
   "claim": "Resolution of the reported major findings is sufficient evidence that the materially refactored system is ready for production.",
   "evidence_boundary": "The audit update records finding-level fixes, not comprehensive coverage of the substantially changed codebase, its configured roles, or a deployed instance.",
   "decision": {

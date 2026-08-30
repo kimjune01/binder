@@ -21,48 +21,81 @@ const artifactById = new Map(item.artifacts.map((artifact) => [artifact.id, arti
     <p class="lede">{item.summary}</p>
   </header>
 
-  <main id="main-content" class="case-body">
-    <section><h2>Claim</h2><p><InlineText text={item.claim} /></p></section>
-    <section><h2>Decision</h2><p>{item.decision.question}</p><p><strong>Expected:</strong> {item.decision.expected}</p></section>
-    <section><h2>Evidence boundary</h2><p>{item.evidence_boundary}</p></section>
-
+  <main id="main-content" class="case-body case-study">
     <section>
-      <h2>Public artifacts</h2>
-      <ul class="artifacts">
-        {item.artifacts.map((artifact) => (
-          <li><span>{artifact.kind}</span><a href={artifact.url} target="_blank" rel="noopener">{artifact.title}<span class="visually-hidden"> (opens in a new tab)</span></a>{artifact.revision && <code>{artifact.revision}</code>}</li>
-        ))}
-      </ul>
+      <p class="section-label">The situation</p>
+      <h2>What happened</h2>
+      <p><InlineText text={item.case_study.situation} /></p>
     </section>
 
     <section>
-      <h2>Evidence edges</h2>
-      <ol class="edges">
-        {item.edges.map((edge) => (
+      <p class="section-label">The turning point</p>
+      <h2>What changed</h2>
+      <p><InlineText text={item.case_study.turning_point} /></p>
+    </section>
+
+    <aside class="claim-box" aria-labelledby="claim-heading">
+      <p class="section-label">Claim under review</p>
+      <h2 id="claim-heading">{item.decision.question}</h2>
+      <p><InlineText text={item.claim} /></p>
+    </aside>
+
+    <section>
+      <p class="section-label">The public record</p>
+      <h2>How the evidence connects</h2>
+      <ol class="evidence-trail">
+        {item.edges.map((edge, index) => (
           <li>
-            <div><strong>{edge.relation}</strong>: {edge.from} → {edge.to} <mark class={edge.status}>{edge.status}</mark></div>
+            <span class="trail-number">{index + 1}</span>
+            <div>
+              <p><InlineText text={`${edge.from} ${edge.relation} ${edge.to}.`} /> <mark class={edge.status}>{edge.status}</mark></p>
             {edge.citations.length > 0 && (
               <small>Sources: {edge.citations.map((id, index) => {
                 const artifact = artifactById.get(id);
-                return <><a href={artifact?.url}>{artifact?.title ?? id}</a>{index < edge.citations.length - 1 ? ", " : ""}</>;
+                return <><a href={artifact?.url} target="_blank" rel="noopener">{artifact?.title ?? id}</a>{index < edge.citations.length - 1 ? ", " : ""}</>;
               })}</small>
             )}
+            </div>
           </li>
         ))}
       </ol>
     </section>
 
-    <section><h2>Missing edges</h2><ul>{item.missing_edges.map((gap) => <li>{gap}</li>)}</ul></section>
+    <section class="verdict">
+      <p class="section-label">The decision</p>
+      <h2>What the evidence warrants</h2>
+      <p class="verdict-text">{item.decision.expected}</p>
+      <p><InlineText text={item.case_study.lesson} /></p>
+    </section>
 
     <section>
-      <h2>Validation packets</h2>
-      <p><a class="packet-button" href={`/validate/${item.id}/`}>Run the blinded review task →</a></p>
-      <div class="packet-grid">
-        <a href={`/cases/${item.id}/control.md`}><strong>Control</strong><span>Raw-source review task</span></a>
-        <a href={`/cases/${item.id}/curated.md`}><strong>Curated</strong><span>Joined case view</span></a>
-        <a href={`/cases/${item.id}/questions.md`}><strong>Questions</strong><span>Fixed decision prompts</span></a>
-        <a href={`/cases/${item.id}/answer-key.md`}><strong>Answer key</strong><span>Boundary and expected decision</span></a>
-      </div>
+      <p class="section-label">The boundary</p>
+      <h2>What remains unknown</h2>
+      <p>{item.evidence_boundary}</p>
+      <ul class="unknowns">{item.missing_edges.map((gap) => <li>{gap}</li>)}</ul>
+    </section>
+
+    <section>
+      <p class="section-label">Go to the record</p>
+      <h2>Inspect it yourself</h2>
+      <details>
+        <summary>Canonical sources</summary>
+        <ul class="artifacts">
+          {item.artifacts.map((artifact) => (
+            <li><span>{artifact.kind}</span><a href={artifact.url} target="_blank" rel="noopener">{artifact.title}<span class="visually-hidden"> (opens in a new tab)</span></a>{artifact.revision && <code>{artifact.revision}</code>}</li>
+          ))}
+        </ul>
+      </details>
+      <details>
+        <summary>Research and validation files</summary>
+        <div class="packet-grid">
+          <a href={`/cases/${item.id}/control.md`}><strong>Control</strong><span>Raw-source review task</span></a>
+          <a href={`/cases/${item.id}/curated.md`}><strong>Curated</strong><span>Joined case view</span></a>
+          <a href={`/cases/${item.id}/questions.md`}><strong>Questions</strong><span>Fixed decision prompts</span></a>
+          <a href={`/cases/${item.id}/answer-key.md`}><strong>Answer key</strong><span>Boundary and expected decision</span></a>
+        </div>
+      </details>
+      <p><a class="packet-button" href={`/validate/${item.id}/`}>Try the blinded review task →</a></p>
     </section>
   </main>
 </Layout>

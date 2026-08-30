@@ -5,6 +5,11 @@
   "ecosystem": "Ethereum / Polkadot / Hyperbridge",
   "class": "postmortem-remediation",
   "summary": "An MMR verifier accepted a genuine leaf while silently leaving a forged out-of-bounds leaf unconsumed; downstream settlement treated both as verified.",
+  "case_study": {
+    "situation": "Hyperbridge's MMR verifier could validate one genuine leaf while silently failing to consume a forged out-of-bounds leaf supplied beside it. Downstream settlement then treated both leaves as verified.",
+    "turning_point": "The fix introduced an `OutOfBoundsLeaves` invariant requiring the verifier to consume the complete submitted set, followed by review and a versioned library release.",
+    "lesson": "The public chain strongly supports remediation of the exploited library path. It does not automatically establish the identity of every live deployment or the soundness of adjacent verifier compositions."
+  },
   "claim": "The OutOfBoundsLeaves check and audited v1.0.0 release remediate the exploited out-of-bounds-leaf path in solidity-merkle-trees.",
   "evidence_boundary": "The postmortem, fix, audit, and release support the named path. They do not imply that every verifier composition or downstream deployment is sound, and the incident itself triggered discovery of additional related flaws.",
   "decision": {

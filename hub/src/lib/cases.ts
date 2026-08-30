@@ -32,6 +32,11 @@ export const publicCaseSchema = z.object({
   ecosystem: z.string().min(1),
   class: z.enum(caseClasses),
   summary: z.string().min(1),
+  case_study: z.object({
+    situation: z.string().min(1),
+    turning_point: z.string().min(1),
+    lesson: z.string().min(1),
+  }).strict(),
   claim: z.string().min(1),
   evidence_boundary: z.string().min(1),
   decision: z.object({

@@ -5,6 +5,11 @@
   "ecosystem": "Ethereum / Uniswap V2",
   "class": "invariant-scope",
   "summary": "The Uniswap V2 audit proved bytecode-level single-call specifications while explicitly excluding the multi-call constant-product invariant and assuming particular token behavior.",
+  "case_study": {
+    "situation": "Runtime Verification specified and proved almost every single-call state transition in the built Uniswap V2 contracts. The work was unusually rigorous and operated directly against bytecode.",
+    "turning_point": "The report explicitly separated those functional specifications from the contract-level constant-product invariant and limited the proofs to assumed token semantics.",
+    "lesson": "Formal verification is only as broad as its specifications and assumptions. The prestige of the method cannot enlarge the world the proof actually describes."
+  },
   "claim": "The formal-verification result establishes the fee-adjusted constant-product invariant for arbitrary Uniswap V2 pairs across sequences of calls.",
   "evidence_boundary": "The published proofs cover almost all single-call state transitions relative to specifications and assumptions. They do not prove multi-call contract invariants, arbitrary token semantics, sqrt correctness, or all behavior around unknown external calls.",
   "decision": {

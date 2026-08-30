@@ -5,6 +5,11 @@
   "ecosystem": "Stellar / Soroban",
   "class": "build-deployment-identity",
   "summary": "A real contract Wasm was reproduced from source in a pinned container, prompting a long design debate over provenance, hostile images, public source, and verification badges.",
+  "case_study": {
+    "situation": "Stellar developers wanted users to connect deployed Wasm to readable source. A prototype rebuilt a real contract inside a pinned container and reproduced the deployed bytes exactly.",
+    "turning_point": "The successful rebuild answered one identity question but exposed another: a pinned image can itself contain an untrusted compiler, so reproducibility does not identify who or what deserves trust.",
+    "lesson": "Source reproducibility, builder provenance, attestation, and behavioral safety are separate claims. A single verified badge would collapse distinctions users need when deciding what to rely on."
+  },
   "claim": "Reproducing the deployed Wasm from the referenced source and build image establishes that the source faithfully describes the contract.",
   "evidence_boundary": "A byte-for-byte rebuild establishes a source/environment/output relationship. It does not establish that the image or compiler is faithful, that the source is safe, or that a named trusted party produced the original artifact.",
   "decision": {

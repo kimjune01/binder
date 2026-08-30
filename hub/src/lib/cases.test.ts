@@ -16,6 +16,9 @@ describe("public case corpus", () => {
     for (const item of cases) {
       expect(item.decision.question).not.toBe("");
       expect(item.decision.expected).not.toBe("");
+      expect(item.case_study.situation).not.toBe("");
+      expect(item.case_study.turning_point).not.toBe("");
+      expect(item.case_study.lesson).not.toBe("");
       expect(item.missing_edges.length).toBeGreaterThan(0);
       for (const edge of item.edges) {
         if (edge.status === "sourced") expect(edge.citations.length).toBeGreaterThan(0);
