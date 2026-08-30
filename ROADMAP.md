@@ -41,6 +41,12 @@ one.
 - Authenticate concrete statements, never infer competence or authority from
   identity alone.
 - Keep popularity separate from evidence quality.
+- Treat outbound completion as success: link to adjacent services rather than
+  absorbing wallets, deployment, audits, identity, data, or professional help.
+- Preserve provider choice through open formats, deep links, and complete
+  exports; no handoff may require a Binder account on the receiving side.
+- Optimize the early project as public infrastructure. Defer monetization until
+  repeated use reveals a service people actually want Binder to operate.
 
 ## Phase 0A — build five manual case fixtures
 
@@ -336,7 +342,8 @@ counterfeit trust.
 - Prefer interoperable manifests and independent catalogs before a
   Binder-operated marketplace.
 - Explore paid verification, remediation, maintenance, deployment, or support
-  only when people already request those transactions.
+  only when people already request those transactions. Do not make revenue an
+  exit gate or privilege Binder-operated providers in discovery.
 
 ### Exit gate
 
@@ -379,3 +386,5 @@ model. Marketplace features must organize activity that exists beforehand.
 - Custom identity, credential, or signing infrastructure.
 - Automatic cross-chain contract translation.
 - Wallet execution, billing, token incentives, governance, and moderation.
+- Monetization mechanisms that weaken export, provider neutrality, or local
+  verification.

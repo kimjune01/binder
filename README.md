@@ -19,6 +19,13 @@ receipt format; a later **Binder Agreements** interface may help parties shop,
 parameterize, independently review, export, and sign an exact contract package.
 Binder does not need to custody funds, choose terms, underwrite risk, adjudicate
 outcomes, or participate at runtime.
+
+Binder is being developed as public infrastructure. Adjacent work should link
+out to existing wallets, explorers, auditors, verifiers, data providers,
+deployment tools, and professional services through open handoffs. Completing a
+workflow elsewhere is success; value capture can be considered after useful,
+repeated use exists.
+
 See [OUTREACH.md](OUTREACH.md) for the soft-discovery and demo conversations
 used to test the product with contract maintainers and auditors.
 The [five-case public research hub](hub/README.md) organizes real audit,

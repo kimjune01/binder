@@ -262,6 +262,14 @@ entitlements, failure paths, and changes. It should not expose an evidence
 graph editor. Its output is a normal Binder package that either party can take
 elsewhere; Binder is not required at runtime.
 
+Binder should be generous at its edges. When another service already performs
+an adjacent function well, Binder should identify the exact handoff and link
+the user there with the relevant artifact or parameters: a wallet for signing,
+an explorer for deployed state, an auditor or verifier for assurance, a build
+service for reproduction, an identity provider for credentials, a data source
+for observations, or qualified legal help for jurisdiction-specific questions.
+An outbound handoff is successful completion, not lost engagement.
+
 ### Native Core interface: an agent-first CLI
 
 The CLI is Binder Core's product interface. Agents already know how to invoke commands, provide files and revisions, inspect exit codes, and pass structured output to the next tool. GitHub Actions, editor integrations, MCP tools, hosted services, and a later agreement interface should be thin adapters over the same Core contract rather than independent implementations of Binder semantics.
@@ -408,6 +416,11 @@ boundary: Binder may help parties inspect choices and bind them to a portable
 artifact, but it does not take custody, underwrite risk, supply legal advice,
 choose consequential terms for either party, adjudicate subjective outcomes,
 or become a required participant in execution.
+
+For now, treat Binder as public infrastructure. Optimize for inspectable
+artifacts, useful outbound handoffs, independent implementations, and completed
+agreements. Revenue capture is not a v1 requirement and must not distort the
+portable format or turn adjacent services into captive Binder features.
 
 ## Relationship to verifiable knowledge
 

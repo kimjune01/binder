@@ -52,6 +52,23 @@ custody, underwrite either side, or adjudicate subjective outcomes. Wallets,
 chains, external evidence sources, and any dispute mechanism remain separate.
 Binder need not participate after signing.
 
+These boundaries are connection points, not dead ends. Binder should link
+directly to appropriate adjacent services and carry enough structured context
+to make the handoff easy:
+
+- wallets and signing tools for key-controlled assent;
+- explorers and RPC providers for deployment and live state;
+- auditors, simulators, fuzzers, and formal verifiers for additional evidence;
+- reproducible-build and attestation systems for artifact identity;
+- identity and credential providers when a party requires them;
+- independent data publishers and relayers for external observations; and
+- qualified legal or financial professionals when a party asks questions
+  outside Binder's competence.
+
+Binder should prefer open interfaces and deep links over recreating these
+services. A party must remain free to choose a different provider or complete
+the workflow manually.
+
 ```text
 Binder establishes                 Binder does not establish
 who accepted which exact package  whether the bargain is wise or fair
@@ -331,6 +348,13 @@ Binder is the claim and evidence layer plus an optional agreement-formation
 interface. It is not the wallet, custodian, underwriter, chain, oracle, identity
 provider, adjudicator, legal adviser, or contract runtime.
 
+For now, Binder is a public service rather than a value-capture strategy. Its
+job is to lower the cost of reaching an inspectable agreement and leave behind
+a portable public artifact. Useful completion may happen in somebody else's
+wallet, explorer, verifier, deployment service, or professional workflow.
+Possible business models can be evaluated after repeated use exists; they must
+not create lock-in at the protocol or package layer.
+
 Its long-term responsibility is to preserve the path:
 
 ```text
@@ -360,6 +384,10 @@ This is not a feature roadmap. Binder should not yet build:
 - a universal safety score;
 - a global canon of trusted contracts; or
 - automatic judgment about which claims humans should accept.
+
+Deferring these functions does not mean hiding them. The human interface may
+explain when one is needed and link to independent providers without endorsing
+one as part of Binder's guarantee.
 
 Those products become relevant only if the narrow Binder workflow first proves
 that explicit entitlement edges and independently replayable evidence improve
