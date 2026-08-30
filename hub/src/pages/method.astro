@@ -1,0 +1,27 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="How Binder evaluates a case">
+  <nav><a href="/">← Binder</a><a href="https://github.com/kimjune01/binder/blob/main/CHECKLIST.md">GitHub source ↗</a></nav>
+  <header class="hero case-hero">
+    <p class="eyebrow">Open method · CC BY-SA 4.0</p>
+    <h1>How Binder evaluates a case</h1>
+    <p class="lede">A checklist for turning an append-only provenance record into a bounded current view and explainable next actions.</p>
+  </header>
+
+  <main id="main-content" class="case-body method-page">
+    <section><h2>1. Fix the subject</h2><ul class="checklist"><li>Name the exact contract, revision, build, or deployment.</li><li>Keep reviewed source, built artifact, and deployed artifact distinct.</li><li>Record stable identifiers or digests.</li></ul></section>
+    <section><h2>2. State the claim</h2><ul class="checklist"><li>Write one consequential claim in understandable language.</li><li>Identify the decision that depends on it.</li><li>State assumptions and the guarantee boundary.</li></ul></section>
+    <section><h2>3. Preserve the chronology</h2><ul class="checklist"><li>Record findings, fixes, observations, reviews, builds, deployments, and challenges in time order.</li><li>Never erase an event when a later event corrects or supersedes it.</li><li>Attribute every event.</li></ul></section>
+    <section><h2>4. Classify provenance</h2><ul class="checklist"><li>Separate public fact, executable observation, human attestation, agent inference, and policy judgment.</li><li>Link sourced edges to canonical artifacts.</li><li>Mark missing, disputed, stale, and superseded edges.</li></ul></section>
+    <section><h2>5. Test the evidence chain</h2><ul class="checklist"><li>Ask whether an observation discriminates the claim from its relevant alternative.</li><li>Check revision and dependency freshness.</li><li>Connect reviewed source to built and deployed artifacts.</li><li>Keep proofs, tests, audits, reproduction, and deployment identity separate.</li></ul></section>
+    <section><h2>6. Derive the current view</h2><ul class="checklist"><li>Carry forward only claims supported by non-superseded evidence.</li><li>Show the latest supported conclusion—not merely the latest statement.</li><li>Keep boundaries and unresolved gaps visible.</li><li>Do not collapse the result into an unqualified “safe” badge.</li></ul></section>
+    <section><h2>7. Derive next actions</h2><ul class="checklist"><li>Start from a visible missing or stale edge.</li><li>Name the policy that makes it necessary.</li><li>Recommend the smallest action that could close it.</li><li>Label recommendations as derived judgments, not facts.</li></ul></section>
+    <aside class="method-rule"><code>visible gap + declared policy → proposed action</code></aside>
+    <section>
+      <h2>Use and adapt the checklist</h2>
+      <p>The canonical Markdown version is <a href="https://github.com/kimjune01/binder/blob/main/CHECKLIST.md">available on GitHub</a>. It is licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>: attribution and the same license are required for adaptations.</p>
+    </section>
+  </main>
+</Layout>

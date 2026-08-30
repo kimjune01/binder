@@ -49,3 +49,7 @@ See [DEMO.md](DEMO.md) for the goal and [AUDIT.md](AUDIT.md) for the acceptance-
 See [PRODUCTION.md](PRODUCTION.md) for the staged plan from local demo to a GitHub workflow and public program-status API.
 The [validation study](VALIDATION.md) is the gate for any further product build.
 See [ONLINE_RESEARCH.md](ONLINE_RESEARCH.md) for the firsthand complaints and incidents motivating that study.
+
+Binder's [case checklist](CHECKLIST.md) documents how the chronology becomes a
+current projection and policy-relative recommendations. The checklist is
+licensed under CC BY-SA 4.0 so others can adapt it under the same terms.
