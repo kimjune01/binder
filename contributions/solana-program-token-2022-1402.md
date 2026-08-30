@@ -53,13 +53,12 @@ contradiction.
 
 ## Potential contribution
 
-> The public helper docs still describe the bug this PR fixes: they say the two
-> supply representations must be synchronized, that minting after
-> `ApplyPendingBurn` is rejected, and that callers must manually re-sync first.
-> `buildConfidentialMintProofPlan` now deliberately derives from
-> `confidentialSupply`, and the new test establishes that the manual re-sync is
-> no longer required. Could we update this JSDoc so callers do not keep the
-> obsolete workaround?
+> The public helper docs still tell callers to manually re-sync the supply after
+> `ApplyPendingBurn`. This PR makes that workaround unnecessary:
+> `buildConfidentialMintProofPlan` now derives from `confidentialSupply`, and the
+> new test covers minting without a re-sync.
+>
+> Could we update the JSDoc to remove the obsolete warning and workaround?
 
 Draft only; not posted.
 

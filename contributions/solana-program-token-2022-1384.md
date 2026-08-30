@@ -58,15 +58,17 @@ the pinned SHA.
 
 ## Potential contribution
 
-> The motivating closed-owner-ATA case is missing from the test and command
-> flow. I closed the empty `owner_associated_account` immediately before the
-> CLI invocation in this test; `recover-nested` then failed with `Provided owner
-> is not allowed`, and the ATA processor logged “recreate the owner associated
-> token account first.” `command_recover_nested` submits only `recover_nested`,
-> while the current test leaves that account live. In the `same_mint` case it is
-> also the destination. Could the test cover the closed-account setup, and could
-> the command either prepend the idempotent ATA creation(s) or document the
-> prerequisite?
+> `recover-nested` fails in the closed-owner-ATA case described by this PR. I
+> closed the empty owner ATA before the CLI call, and the command failed with
+> `Provided owner is not allowed`. The ATA processor said to recreate the owner
+> ATA first.
+>
+> The current test leaves that account open, and the command submits only the
+> `recover_nested` instruction. In the `same_mint` case, the missing owner ATA is
+> also the destination.
+>
+> Could the test cover the closed-account setup? The command could then either
+> recreate the required ATA(s) or document the prerequisite.
 
 Draft only; not posted.
 
